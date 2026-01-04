@@ -29,8 +29,8 @@ export * from "./enums"
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Users
- * const users = await prisma.user.findMany()
+ * // Fetch zero or more VerificationTokens
+ * const verificationTokens = await prisma.verificationToken.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -40,10 +40,10 @@ export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts exten
 export { Prisma }
 
 /**
- * Model User
+ * Model VerificationToken
  * 
  */
-export type User = Prisma.UserModel
+export type VerificationToken = Prisma.VerificationTokenModel
 /**
  * Model Account
  * 
@@ -55,12 +55,7 @@ export type Account = Prisma.AccountModel
  */
 export type Session = Prisma.SessionModel
 /**
- * Model VerificationToken
+ * Model User
  * 
  */
-export type VerificationToken = Prisma.VerificationTokenModel
-/**
- * Model Authenticator
- * 
- */
-export type Authenticator = Prisma.AuthenticatorModel
+export type User = Prisma.UserModel
