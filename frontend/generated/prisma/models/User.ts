@@ -218,6 +218,10 @@ export type UserWhereInput = {
   image?: Prisma.StringNullableFilter<"User"> | string | null
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
+  createdAsceticisms?: Prisma.AsceticismListRelationFilter
+  userAsceticisms?: Prisma.UserAsceticismListRelationFilter
+  userPrograms?: Prisma.UserProgramListRelationFilter
+  groupMembers?: Prisma.GroupMemberListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -228,6 +232,10 @@ export type UserOrderByWithRelationInput = {
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
+  createdAsceticisms?: Prisma.AsceticismOrderByRelationAggregateInput
+  userAsceticisms?: Prisma.UserAsceticismOrderByRelationAggregateInput
+  userPrograms?: Prisma.UserProgramOrderByRelationAggregateInput
+  groupMembers?: Prisma.GroupMemberOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -241,6 +249,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   image?: Prisma.StringNullableFilter<"User"> | string | null
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
+  createdAsceticisms?: Prisma.AsceticismListRelationFilter
+  userAsceticisms?: Prisma.UserAsceticismListRelationFilter
+  userPrograms?: Prisma.UserProgramListRelationFilter
+  groupMembers?: Prisma.GroupMemberListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -274,6 +286,10 @@ export type UserCreateInput = {
   image?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  createdAsceticisms?: Prisma.AsceticismCreateNestedManyWithoutCreatorInput
+  userAsceticisms?: Prisma.UserAsceticismCreateNestedManyWithoutUserInput
+  userPrograms?: Prisma.UserProgramCreateNestedManyWithoutUserInput
+  groupMembers?: Prisma.GroupMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -284,6 +300,10 @@ export type UserUncheckedCreateInput = {
   image?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  createdAsceticisms?: Prisma.AsceticismUncheckedCreateNestedManyWithoutCreatorInput
+  userAsceticisms?: Prisma.UserAsceticismUncheckedCreateNestedManyWithoutUserInput
+  userPrograms?: Prisma.UserProgramUncheckedCreateNestedManyWithoutUserInput
+  groupMembers?: Prisma.GroupMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -293,6 +313,10 @@ export type UserUpdateInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  createdAsceticisms?: Prisma.AsceticismUpdateManyWithoutCreatorNestedInput
+  userAsceticisms?: Prisma.UserAsceticismUpdateManyWithoutUserNestedInput
+  userPrograms?: Prisma.UserProgramUpdateManyWithoutUserNestedInput
+  groupMembers?: Prisma.GroupMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -303,6 +327,10 @@ export type UserUncheckedUpdateInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  createdAsceticisms?: Prisma.AsceticismUncheckedUpdateManyWithoutCreatorNestedInput
+  userAsceticisms?: Prisma.UserAsceticismUncheckedUpdateManyWithoutUserNestedInput
+  userPrograms?: Prisma.UserProgramUncheckedUpdateManyWithoutUserNestedInput
+  groupMembers?: Prisma.GroupMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -365,6 +393,11 @@ export type UserSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type UserCreateNestedOneWithoutAccountsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutAccountsInput, Prisma.UserUncheckedCreateWithoutAccountsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutAccountsInput
@@ -397,12 +430,74 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
+export type UserCreateNestedOneWithoutCreatedAsceticismsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedAsceticismsInput, Prisma.UserUncheckedCreateWithoutCreatedAsceticismsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedAsceticismsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutCreatedAsceticismsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedAsceticismsInput, Prisma.UserUncheckedCreateWithoutCreatedAsceticismsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedAsceticismsInput
+  upsert?: Prisma.UserUpsertWithoutCreatedAsceticismsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedAsceticismsInput, Prisma.UserUpdateWithoutCreatedAsceticismsInput>, Prisma.UserUncheckedUpdateWithoutCreatedAsceticismsInput>
+}
+
+export type UserCreateNestedOneWithoutUserAsceticismsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUserAsceticismsInput, Prisma.UserUncheckedCreateWithoutUserAsceticismsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUserAsceticismsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutUserAsceticismsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUserAsceticismsInput, Prisma.UserUncheckedCreateWithoutUserAsceticismsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUserAsceticismsInput
+  upsert?: Prisma.UserUpsertWithoutUserAsceticismsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUserAsceticismsInput, Prisma.UserUpdateWithoutUserAsceticismsInput>, Prisma.UserUncheckedUpdateWithoutUserAsceticismsInput>
+}
+
+export type UserCreateNestedOneWithoutUserProgramsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUserProgramsInput, Prisma.UserUncheckedCreateWithoutUserProgramsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUserProgramsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutUserProgramsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutUserProgramsInput, Prisma.UserUncheckedCreateWithoutUserProgramsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUserProgramsInput
+  upsert?: Prisma.UserUpsertWithoutUserProgramsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUserProgramsInput, Prisma.UserUpdateWithoutUserProgramsInput>, Prisma.UserUncheckedUpdateWithoutUserProgramsInput>
+}
+
+export type UserCreateNestedOneWithoutGroupMembersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutGroupMembersInput, Prisma.UserUncheckedCreateWithoutGroupMembersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutGroupMembersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutGroupMembersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutGroupMembersInput, Prisma.UserUncheckedCreateWithoutGroupMembersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutGroupMembersInput
+  upsert?: Prisma.UserUpsertWithoutGroupMembersInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutGroupMembersInput, Prisma.UserUpdateWithoutGroupMembersInput>, Prisma.UserUncheckedUpdateWithoutGroupMembersInput>
+}
+
 export type UserCreateWithoutAccountsInput = {
   name?: string | null
   email?: string | null
   emailVerified?: Date | string | null
   image?: string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  createdAsceticisms?: Prisma.AsceticismCreateNestedManyWithoutCreatorInput
+  userAsceticisms?: Prisma.UserAsceticismCreateNestedManyWithoutUserInput
+  userPrograms?: Prisma.UserProgramCreateNestedManyWithoutUserInput
+  groupMembers?: Prisma.GroupMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -412,6 +507,10 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   emailVerified?: Date | string | null
   image?: string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  createdAsceticisms?: Prisma.AsceticismUncheckedCreateNestedManyWithoutCreatorInput
+  userAsceticisms?: Prisma.UserAsceticismUncheckedCreateNestedManyWithoutUserInput
+  userPrograms?: Prisma.UserProgramUncheckedCreateNestedManyWithoutUserInput
+  groupMembers?: Prisma.GroupMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -436,6 +535,10 @@ export type UserUpdateWithoutAccountsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  createdAsceticisms?: Prisma.AsceticismUpdateManyWithoutCreatorNestedInput
+  userAsceticisms?: Prisma.UserAsceticismUpdateManyWithoutUserNestedInput
+  userPrograms?: Prisma.UserProgramUpdateManyWithoutUserNestedInput
+  groupMembers?: Prisma.GroupMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -445,6 +548,10 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  createdAsceticisms?: Prisma.AsceticismUncheckedUpdateManyWithoutCreatorNestedInput
+  userAsceticisms?: Prisma.UserAsceticismUncheckedUpdateManyWithoutUserNestedInput
+  userPrograms?: Prisma.UserProgramUncheckedUpdateManyWithoutUserNestedInput
+  groupMembers?: Prisma.GroupMemberUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -453,6 +560,10 @@ export type UserCreateWithoutSessionsInput = {
   emailVerified?: Date | string | null
   image?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  createdAsceticisms?: Prisma.AsceticismCreateNestedManyWithoutCreatorInput
+  userAsceticisms?: Prisma.UserAsceticismCreateNestedManyWithoutUserInput
+  userPrograms?: Prisma.UserProgramCreateNestedManyWithoutUserInput
+  groupMembers?: Prisma.GroupMemberCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -462,6 +573,10 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   emailVerified?: Date | string | null
   image?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  createdAsceticisms?: Prisma.AsceticismUncheckedCreateNestedManyWithoutCreatorInput
+  userAsceticisms?: Prisma.UserAsceticismUncheckedCreateNestedManyWithoutUserInput
+  userPrograms?: Prisma.UserProgramUncheckedCreateNestedManyWithoutUserInput
+  groupMembers?: Prisma.GroupMemberUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -486,6 +601,10 @@ export type UserUpdateWithoutSessionsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  createdAsceticisms?: Prisma.AsceticismUpdateManyWithoutCreatorNestedInput
+  userAsceticisms?: Prisma.UserAsceticismUpdateManyWithoutUserNestedInput
+  userPrograms?: Prisma.UserProgramUpdateManyWithoutUserNestedInput
+  groupMembers?: Prisma.GroupMemberUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -495,6 +614,274 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  createdAsceticisms?: Prisma.AsceticismUncheckedUpdateManyWithoutCreatorNestedInput
+  userAsceticisms?: Prisma.UserAsceticismUncheckedUpdateManyWithoutUserNestedInput
+  userPrograms?: Prisma.UserProgramUncheckedUpdateManyWithoutUserNestedInput
+  groupMembers?: Prisma.GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutCreatedAsceticismsInput = {
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  userAsceticisms?: Prisma.UserAsceticismCreateNestedManyWithoutUserInput
+  userPrograms?: Prisma.UserProgramCreateNestedManyWithoutUserInput
+  groupMembers?: Prisma.GroupMemberCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedAsceticismsInput = {
+  id?: number
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  userAsceticisms?: Prisma.UserAsceticismUncheckedCreateNestedManyWithoutUserInput
+  userPrograms?: Prisma.UserProgramUncheckedCreateNestedManyWithoutUserInput
+  groupMembers?: Prisma.GroupMemberUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedAsceticismsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedAsceticismsInput, Prisma.UserUncheckedCreateWithoutCreatedAsceticismsInput>
+}
+
+export type UserUpsertWithoutCreatedAsceticismsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedAsceticismsInput, Prisma.UserUncheckedUpdateWithoutCreatedAsceticismsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedAsceticismsInput, Prisma.UserUncheckedCreateWithoutCreatedAsceticismsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedAsceticismsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedAsceticismsInput, Prisma.UserUncheckedUpdateWithoutCreatedAsceticismsInput>
+}
+
+export type UserUpdateWithoutCreatedAsceticismsInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  userAsceticisms?: Prisma.UserAsceticismUpdateManyWithoutUserNestedInput
+  userPrograms?: Prisma.UserProgramUpdateManyWithoutUserNestedInput
+  groupMembers?: Prisma.GroupMemberUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedAsceticismsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  userAsceticisms?: Prisma.UserAsceticismUncheckedUpdateManyWithoutUserNestedInput
+  userPrograms?: Prisma.UserProgramUncheckedUpdateManyWithoutUserNestedInput
+  groupMembers?: Prisma.GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutUserAsceticismsInput = {
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  createdAsceticisms?: Prisma.AsceticismCreateNestedManyWithoutCreatorInput
+  userPrograms?: Prisma.UserProgramCreateNestedManyWithoutUserInput
+  groupMembers?: Prisma.GroupMemberCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutUserAsceticismsInput = {
+  id?: number
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  createdAsceticisms?: Prisma.AsceticismUncheckedCreateNestedManyWithoutCreatorInput
+  userPrograms?: Prisma.UserProgramUncheckedCreateNestedManyWithoutUserInput
+  groupMembers?: Prisma.GroupMemberUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutUserAsceticismsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUserAsceticismsInput, Prisma.UserUncheckedCreateWithoutUserAsceticismsInput>
+}
+
+export type UserUpsertWithoutUserAsceticismsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUserAsceticismsInput, Prisma.UserUncheckedUpdateWithoutUserAsceticismsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUserAsceticismsInput, Prisma.UserUncheckedCreateWithoutUserAsceticismsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutUserAsceticismsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUserAsceticismsInput, Prisma.UserUncheckedUpdateWithoutUserAsceticismsInput>
+}
+
+export type UserUpdateWithoutUserAsceticismsInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  createdAsceticisms?: Prisma.AsceticismUpdateManyWithoutCreatorNestedInput
+  userPrograms?: Prisma.UserProgramUpdateManyWithoutUserNestedInput
+  groupMembers?: Prisma.GroupMemberUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUserAsceticismsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  createdAsceticisms?: Prisma.AsceticismUncheckedUpdateManyWithoutCreatorNestedInput
+  userPrograms?: Prisma.UserProgramUncheckedUpdateManyWithoutUserNestedInput
+  groupMembers?: Prisma.GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutUserProgramsInput = {
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  createdAsceticisms?: Prisma.AsceticismCreateNestedManyWithoutCreatorInput
+  userAsceticisms?: Prisma.UserAsceticismCreateNestedManyWithoutUserInput
+  groupMembers?: Prisma.GroupMemberCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutUserProgramsInput = {
+  id?: number
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  createdAsceticisms?: Prisma.AsceticismUncheckedCreateNestedManyWithoutCreatorInput
+  userAsceticisms?: Prisma.UserAsceticismUncheckedCreateNestedManyWithoutUserInput
+  groupMembers?: Prisma.GroupMemberUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutUserProgramsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutUserProgramsInput, Prisma.UserUncheckedCreateWithoutUserProgramsInput>
+}
+
+export type UserUpsertWithoutUserProgramsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutUserProgramsInput, Prisma.UserUncheckedUpdateWithoutUserProgramsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutUserProgramsInput, Prisma.UserUncheckedCreateWithoutUserProgramsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutUserProgramsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutUserProgramsInput, Prisma.UserUncheckedUpdateWithoutUserProgramsInput>
+}
+
+export type UserUpdateWithoutUserProgramsInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  createdAsceticisms?: Prisma.AsceticismUpdateManyWithoutCreatorNestedInput
+  userAsceticisms?: Prisma.UserAsceticismUpdateManyWithoutUserNestedInput
+  groupMembers?: Prisma.GroupMemberUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutUserProgramsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  createdAsceticisms?: Prisma.AsceticismUncheckedUpdateManyWithoutCreatorNestedInput
+  userAsceticisms?: Prisma.UserAsceticismUncheckedUpdateManyWithoutUserNestedInput
+  groupMembers?: Prisma.GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutGroupMembersInput = {
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  createdAsceticisms?: Prisma.AsceticismCreateNestedManyWithoutCreatorInput
+  userAsceticisms?: Prisma.UserAsceticismCreateNestedManyWithoutUserInput
+  userPrograms?: Prisma.UserProgramCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutGroupMembersInput = {
+  id?: number
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  createdAsceticisms?: Prisma.AsceticismUncheckedCreateNestedManyWithoutCreatorInput
+  userAsceticisms?: Prisma.UserAsceticismUncheckedCreateNestedManyWithoutUserInput
+  userPrograms?: Prisma.UserProgramUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutGroupMembersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutGroupMembersInput, Prisma.UserUncheckedCreateWithoutGroupMembersInput>
+}
+
+export type UserUpsertWithoutGroupMembersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutGroupMembersInput, Prisma.UserUncheckedUpdateWithoutGroupMembersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutGroupMembersInput, Prisma.UserUncheckedCreateWithoutGroupMembersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutGroupMembersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutGroupMembersInput, Prisma.UserUncheckedUpdateWithoutGroupMembersInput>
+}
+
+export type UserUpdateWithoutGroupMembersInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  createdAsceticisms?: Prisma.AsceticismUpdateManyWithoutCreatorNestedInput
+  userAsceticisms?: Prisma.UserAsceticismUpdateManyWithoutUserNestedInput
+  userPrograms?: Prisma.UserProgramUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutGroupMembersInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  createdAsceticisms?: Prisma.AsceticismUncheckedUpdateManyWithoutCreatorNestedInput
+  userAsceticisms?: Prisma.UserAsceticismUncheckedUpdateManyWithoutUserNestedInput
+  userPrograms?: Prisma.UserProgramUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -505,11 +892,19 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
 export type UserCountOutputType = {
   accounts: number
   sessions: number
+  createdAsceticisms: number
+  userAsceticisms: number
+  userPrograms: number
+  groupMembers: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
+  createdAsceticisms?: boolean | UserCountOutputTypeCountCreatedAsceticismsArgs
+  userAsceticisms?: boolean | UserCountOutputTypeCountUserAsceticismsArgs
+  userPrograms?: boolean | UserCountOutputTypeCountUserProgramsArgs
+  groupMembers?: boolean | UserCountOutputTypeCountGroupMembersArgs
 }
 
 /**
@@ -536,6 +931,34 @@ export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.SessionWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedAsceticismsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AsceticismWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountUserAsceticismsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserAsceticismWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountUserProgramsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserProgramWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountGroupMembersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.GroupMemberWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -545,6 +968,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   image?: boolean
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  createdAsceticisms?: boolean | Prisma.User$createdAsceticismsArgs<ExtArgs>
+  userAsceticisms?: boolean | Prisma.User$userAsceticismsArgs<ExtArgs>
+  userPrograms?: boolean | Prisma.User$userProgramsArgs<ExtArgs>
+  groupMembers?: boolean | Prisma.User$groupMembersArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -576,6 +1003,10 @@ export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  createdAsceticisms?: boolean | Prisma.User$createdAsceticismsArgs<ExtArgs>
+  userAsceticisms?: boolean | Prisma.User$userAsceticismsArgs<ExtArgs>
+  userPrograms?: boolean | Prisma.User$userProgramsArgs<ExtArgs>
+  groupMembers?: boolean | Prisma.User$groupMembersArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -586,6 +1017,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     accounts: Prisma.$AccountPayload<ExtArgs>[]
     sessions: Prisma.$SessionPayload<ExtArgs>[]
+    createdAsceticisms: Prisma.$AsceticismPayload<ExtArgs>[]
+    userAsceticisms: Prisma.$UserAsceticismPayload<ExtArgs>[]
+    userPrograms: Prisma.$UserProgramPayload<ExtArgs>[]
+    groupMembers: Prisma.$GroupMemberPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -989,6 +1424,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdAsceticisms<T extends Prisma.User$createdAsceticismsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdAsceticismsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AsceticismPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  userAsceticisms<T extends Prisma.User$userAsceticismsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$userAsceticismsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserAsceticismPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  userPrograms<T extends Prisma.User$userProgramsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$userProgramsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserProgramPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  groupMembers<T extends Prisma.User$groupMembersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$groupMembersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GroupMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1456,6 +1895,102 @@ export type User$sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[]
+}
+
+/**
+ * User.createdAsceticisms
+ */
+export type User$createdAsceticismsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Asceticism
+   */
+  select?: Prisma.AsceticismSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Asceticism
+   */
+  omit?: Prisma.AsceticismOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AsceticismInclude<ExtArgs> | null
+  where?: Prisma.AsceticismWhereInput
+  orderBy?: Prisma.AsceticismOrderByWithRelationInput | Prisma.AsceticismOrderByWithRelationInput[]
+  cursor?: Prisma.AsceticismWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AsceticismScalarFieldEnum | Prisma.AsceticismScalarFieldEnum[]
+}
+
+/**
+ * User.userAsceticisms
+ */
+export type User$userAsceticismsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserAsceticism
+   */
+  select?: Prisma.UserAsceticismSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserAsceticism
+   */
+  omit?: Prisma.UserAsceticismOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAsceticismInclude<ExtArgs> | null
+  where?: Prisma.UserAsceticismWhereInput
+  orderBy?: Prisma.UserAsceticismOrderByWithRelationInput | Prisma.UserAsceticismOrderByWithRelationInput[]
+  cursor?: Prisma.UserAsceticismWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserAsceticismScalarFieldEnum | Prisma.UserAsceticismScalarFieldEnum[]
+}
+
+/**
+ * User.userPrograms
+ */
+export type User$userProgramsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserProgram
+   */
+  select?: Prisma.UserProgramSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserProgram
+   */
+  omit?: Prisma.UserProgramOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserProgramInclude<ExtArgs> | null
+  where?: Prisma.UserProgramWhereInput
+  orderBy?: Prisma.UserProgramOrderByWithRelationInput | Prisma.UserProgramOrderByWithRelationInput[]
+  cursor?: Prisma.UserProgramWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserProgramScalarFieldEnum | Prisma.UserProgramScalarFieldEnum[]
+}
+
+/**
+ * User.groupMembers
+ */
+export type User$groupMembersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GroupMember
+   */
+  select?: Prisma.GroupMemberSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GroupMember
+   */
+  omit?: Prisma.GroupMemberOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GroupMemberInclude<ExtArgs> | null
+  where?: Prisma.GroupMemberWhereInput
+  orderBy?: Prisma.GroupMemberOrderByWithRelationInput | Prisma.GroupMemberOrderByWithRelationInput[]
+  cursor?: Prisma.GroupMemberWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.GroupMemberScalarFieldEnum | Prisma.GroupMemberScalarFieldEnum[]
 }
 
 /**

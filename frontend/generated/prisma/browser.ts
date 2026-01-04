@@ -37,3 +37,43 @@ export type Session = Prisma.SessionModel
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model Asceticism
+ * 
+ */
+export type Asceticism = Prisma.AsceticismModel
+/**
+ * Model UserAsceticism
+ * 
+ */
+export type UserAsceticism = Prisma.UserAsceticismModel
+/**
+ * Model AsceticismLog
+ * 
+ */
+export type AsceticismLog = Prisma.AsceticismLogModel
+/**
+ * Model Program
+ * 
+ */
+export type Program = Prisma.ProgramModel
+/**
+ * Model ProgramItem
+ * 
+ */
+export type ProgramItem = Prisma.ProgramItemModel
+/**
+ * Model UserProgram
+ * 
+ */
+export type UserProgram = Prisma.UserProgramModel
+/**
+ * Model Group
+ * 
+ */
+export type Group = Prisma.GroupModel
+/**
+ * Model GroupMember
+ * 
+ */
+export type GroupMember = Prisma.GroupMemberModel

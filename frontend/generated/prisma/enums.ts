@@ -9,7 +9,29 @@
 * 🟢 You can import this file directly.
 */
 
+export const TrackingType = {
+  BOOLEAN: 'BOOLEAN',
+  NUMERIC: 'NUMERIC',
+  TEXT: 'TEXT'
+} as const
+
+export type TrackingType = (typeof TrackingType)[keyof typeof TrackingType]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const AsceticismStatus = {
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  COMPLETED: 'COMPLETED',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type AsceticismStatus = (typeof AsceticismStatus)[keyof typeof AsceticismStatus]
+
+
+export const GroupRole = {
+  MEMBER: 'MEMBER',
+  ADMIN: 'ADMIN',
+  MENTOR: 'MENTOR'
+} as const
+
+export type GroupRole = (typeof GroupRole)[keyof typeof GroupRole]

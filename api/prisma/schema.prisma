@@ -1,0 +1,237 @@
+// This schema is a copy for Python API usage
+
+generator client_py {
+    provider             = "prisma-client-py"
+    interface            = "asyncio"
+    recursive_type_depth = 5
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model VerificationToken {
+    identifier String
+    expires    DateTime
+    token      String
+
+    @@id([identifier, token])
+    @@map("verification_token")
+}
+
+model Account {
+    id                Int     @id @default(autoincrement())
+    userId            Int
+    type              String  @db.VarChar(255)
+    provider          String  @db.VarChar(255)
+    providerAccountId String  @db.VarChar(255)
+    refresh_token     String?
+    access_token      String?
+    expires_at        BigInt?
+    id_token          String?
+    scope             String?
+    session_state     String?
+    token_type        String?
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+    @@map("accounts")
+}
+
+model Session {
+    id           Int      @id @default(autoincrement())
+    userId       Int
+    expires      DateTime
+    sessionToken String   @unique @db.VarChar(255)
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("sessions")
+}
+
+model User {
+    id            Int       @id @default(autoincrement())
+    name          String?   @db.VarChar(255)
+    email         String?   @unique @db.VarChar(255)
+    emailVerified DateTime?
+    image         String?
+
+    accounts           Account[]
+    sessions           Session[]
+    createdAsceticisms Asceticism[]     @relation("CreatedAsceticisms")
+    userAsceticisms    UserAsceticism[]
+    userPrograms       UserProgram[]
+    groupMembers       GroupMember[]
+
+    @@map("users")
+}
+
+/// --------------------
+/// Asceticism Core
+/// --------------------
+
+// The definition of a practice (e.g. "Cold Showers", "Daily Rosary")
+model Asceticism {
+    id          Int     @id @default(autoincrement())
+    title       String
+    description String?
+    category    String // e.g. "Physical", "Spiritual", "Intellectual"
+    icon        String? // For UI icon name/url
+
+    // Configuration
+    isTemplate Boolean @default(false)
+    creatorId  Int?
+
+    // Tracking config
+    type TrackingType @default(BOOLEAN)
+
+    // Extensibility: Store arbitrary config like standard units, difficulty ratings, or tags
+    metadata Json?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userAsceticisms UserAsceticism[]
+    programItems    ProgramItem[]
+
+    creator User? @relation("CreatedAsceticisms", fields: [creatorId], references: [id])
+}
+
+// A user's subscription/commitment to an asceticism
+model UserAsceticism {
+    id           Int @id @default(autoincrement())
+    userId       Int
+    asceticismId Int
+
+    status    AsceticismStatus @default(ACTIVE)
+    startDate DateTime         @default(now())
+    endDate   DateTime?
+
+    // Personal overrides
+    targetValue  Float?
+    reminderTime DateTime?
+
+    // Extensibility: Store user-specific settings like specific recurrence days (e.g. "Mon, Wed"), local streak data, etc.
+    metadata Json?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+    asceticism Asceticism      @relation(fields: [asceticismId], references: [id], onDelete: Cascade)
+    logs       AsceticismLog[]
+}
+
+// Daily record
+model AsceticismLog {
+    id               Int      @id @default(autoincrement())
+    userAsceticismId Int
+    date             DateTime
+
+    completed Boolean @default(false)
+    value     Float?
+    notes     String?
+
+    // Extensibility: Store rich context like location, mood during completion, or image URLs
+    metadata Json?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userAsceticism UserAsceticism @relation(fields: [userAsceticismId], references: [id], onDelete: Cascade)
+
+    @@unique([userAsceticismId, date])
+}
+
+/// --------------------
+/// Programs / Tracks
+/// --------------------
+
+model Program {
+    id          Int     @id @default(autoincrement())
+    name        String
+    description String?
+    isPublic    Boolean @default(false)
+    creatorId   Int
+
+    metadata Json? // Extensibility
+
+    items         ProgramItem[]
+    enrolledUsers UserProgram[]
+}
+
+model ProgramItem {
+    id           Int @id @default(autoincrement())
+    programId    Int
+    asceticismId Int
+
+    dayStart Int  @default(1)
+    dayEnd   Int?
+
+    metadata Json? // Extensibility
+
+    program    Program    @relation(fields: [programId], references: [id])
+    asceticism Asceticism @relation(fields: [asceticismId], references: [id])
+}
+
+model UserProgram {
+    id        Int      @id @default(autoincrement())
+    userId    Int
+    programId Int
+    startDate DateTime
+
+    metadata Json? // Extensibility: Track program-specific progress/state
+
+    user    User    @relation(fields: [userId], references: [id])
+    program Program @relation(fields: [programId], references: [id])
+}
+
+/// --------------------
+/// Collaboration
+/// --------------------
+
+model Group {
+    id          Int     @id @default(autoincrement())
+    name        String
+    description String?
+    inviteCode  String? @unique
+    avatar      String?
+
+    metadata Json? // Extensibility: Group settings, joining rules
+
+    members GroupMember[]
+}
+
+model GroupMember {
+    id      Int       @id @default(autoincrement())
+    groupId Int
+    userId  Int
+    role    GroupRole @default(MEMBER)
+
+    metadata Json? // Extensibility
+
+    group Group @relation(fields: [groupId], references: [id])
+    user  User  @relation(fields: [userId], references: [id])
+}
+
+// ... Enums ...
+enum TrackingType {
+    BOOLEAN
+    NUMERIC
+    TEXT
+}
+
+enum AsceticismStatus {
+    ACTIVE
+    PAUSED
+    COMPLETED
+    ARCHIVED
+}
+
+enum GroupRole {
+    MEMBER
+    ADMIN
+    MENTOR
+}

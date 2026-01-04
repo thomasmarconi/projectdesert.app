@@ -54,7 +54,15 @@ export const ModelName = {
   VerificationToken: 'VerificationToken',
   Account: 'Account',
   Session: 'Session',
-  User: 'User'
+  User: 'User',
+  Asceticism: 'Asceticism',
+  UserAsceticism: 'UserAsceticism',
+  AsceticismLog: 'AsceticismLog',
+  Program: 'Program',
+  ProgramItem: 'ProgramItem',
+  UserProgram: 'UserProgram',
+  Group: 'Group',
+  GroupMember: 'GroupMember'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -121,12 +129,127 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const AsceticismScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  category: 'category',
+  icon: 'icon',
+  isTemplate: 'isTemplate',
+  creatorId: 'creatorId',
+  type: 'type',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AsceticismScalarFieldEnum = (typeof AsceticismScalarFieldEnum)[keyof typeof AsceticismScalarFieldEnum]
+
+
+export const UserAsceticismScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  asceticismId: 'asceticismId',
+  status: 'status',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  targetValue: 'targetValue',
+  reminderTime: 'reminderTime',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserAsceticismScalarFieldEnum = (typeof UserAsceticismScalarFieldEnum)[keyof typeof UserAsceticismScalarFieldEnum]
+
+
+export const AsceticismLogScalarFieldEnum = {
+  id: 'id',
+  userAsceticismId: 'userAsceticismId',
+  date: 'date',
+  completed: 'completed',
+  value: 'value',
+  notes: 'notes',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AsceticismLogScalarFieldEnum = (typeof AsceticismLogScalarFieldEnum)[keyof typeof AsceticismLogScalarFieldEnum]
+
+
+export const ProgramScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  isPublic: 'isPublic',
+  creatorId: 'creatorId',
+  metadata: 'metadata'
+} as const
+
+export type ProgramScalarFieldEnum = (typeof ProgramScalarFieldEnum)[keyof typeof ProgramScalarFieldEnum]
+
+
+export const ProgramItemScalarFieldEnum = {
+  id: 'id',
+  programId: 'programId',
+  asceticismId: 'asceticismId',
+  dayStart: 'dayStart',
+  dayEnd: 'dayEnd',
+  metadata: 'metadata'
+} as const
+
+export type ProgramItemScalarFieldEnum = (typeof ProgramItemScalarFieldEnum)[keyof typeof ProgramItemScalarFieldEnum]
+
+
+export const UserProgramScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  programId: 'programId',
+  startDate: 'startDate',
+  metadata: 'metadata'
+} as const
+
+export type UserProgramScalarFieldEnum = (typeof UserProgramScalarFieldEnum)[keyof typeof UserProgramScalarFieldEnum]
+
+
+export const GroupScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  inviteCode: 'inviteCode',
+  avatar: 'avatar',
+  metadata: 'metadata'
+} as const
+
+export type GroupScalarFieldEnum = (typeof GroupScalarFieldEnum)[keyof typeof GroupScalarFieldEnum]
+
+
+export const GroupMemberScalarFieldEnum = {
+  id: 'id',
+  groupId: 'groupId',
+  userId: 'userId',
+  role: 'role',
+  metadata: 'metadata'
+} as const
+
+export type GroupMemberScalarFieldEnum = (typeof GroupMemberScalarFieldEnum)[keyof typeof GroupMemberScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: 'DbNull',
+  JsonNull: 'JsonNull'
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -143,4 +266,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: 'DbNull',
+  JsonNull: 'JsonNull',
+  AnyNull: 'AnyNull'
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
