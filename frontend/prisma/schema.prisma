@@ -62,3 +62,212 @@ model User {
 
   @@map("users")
 }
+
+/**
+ * THIS IS PROPOSED FROM CHATGPT
+ * generator client {
+ * provider = "prisma-client"
+ * output   = "../generated/prisma"
+ * }
+ * datasource db {
+ * provider = "postgresql"
+ * }
+ * /// --------------------
+ * /// Auth Models (Existing)
+ * /// --------------------
+ * model User {
+ * id            Int       @id @default(autoincrement())
+ * name          String?   @db.VarChar(255)
+ * email         String?   @unique @db.VarChar(255)
+ * emailVerified DateTime?
+ * image         String?
+ * accounts     Account[]
+ * sessions     Session[]
+ * userGoals    UserGoal[]
+ * groups       GroupMember[]
+ * checkIns     CheckIn[]
+ * messagesSent Message[]     @relation("sentMessages")
+ * messagesRecv Message[]     @relation("receivedMessages")
+ * intentions   Intention[]
+ * roles        UserRole[]
+ * @@map("users")
+ * }
+ * model Account {
+ * id                Int     @id @default(autoincrement())
+ * userId            Int
+ * type              String  @db.VarChar(255)
+ * provider          String  @db.VarChar(255)
+ * providerAccountId String  @db.VarChar(255)
+ * refresh_token     String?
+ * access_token      String?
+ * expires_at        BigInt?
+ * id_token          String?
+ * scope             String?
+ * session_state     String?
+ * token_type        String?
+ * user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ * @@unique([provider, providerAccountId])
+ * @@map("accounts")
+ * }
+ * model Session {
+ * id           Int      @id @default(autoincrement())
+ * userId       Int
+ * expires      DateTime
+ * sessionToken String   @unique @db.VarChar(255)
+ * user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ * @@map("sessions")
+ * }
+ * model VerificationToken {
+ * identifier String
+ * expires    DateTime
+ * token      String
+ * @@id([identifier, token])
+ * @@map("verification_token")
+ * }
+ * /// --------------------
+ * /// Core Habit/Goal Tracking
+ * /// --------------------
+ * model Goal {
+ * id               Int      @id @default(autoincrement())
+ * name             String
+ * description      String?
+ * category         String? // e.g., "Spirituality", "Health", "Productivity"
+ * unit             String? // e.g., "minutes", "times", "yes/no"
+ * defaultFrequency String? // e.g., "daily", "weekly"
+ * isTemplate       Boolean  @default(false) // For content templates/programs
+ * createdAt        DateTime @default(now())
+ * updatedAt        DateTime @updatedAt
+ * userGoals UserGoal[]
+ * }
+ * model UserGoal {
+ * id          Int       @id @default(autoincrement())
+ * userId      Int
+ * goalId      Int
+ * startDate   DateTime
+ * endDate     DateTime?
+ * targetValue Float? // optional numeric target
+ * notes       String?
+ * createdAt   DateTime  @default(now())
+ * updatedAt   DateTime  @updatedAt
+ * user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+ * goal     Goal      @relation(fields: [goalId], references: [id], onDelete: Cascade)
+ * checkIns CheckIn[]
+ * }
+ * /// Daily tracking
+ * model CheckIn {
+ * id         Int      @id @default(autoincrement())
+ * userGoalId Int
+ * date       DateTime
+ * completed  Boolean  @default(false)
+ * value      Float? // optional numeric value
+ * notes      String?
+ * createdAt  DateTime @default(now())
+ * updatedAt  DateTime @updatedAt
+ * userGoal UserGoal @relation(fields: [userGoalId], references: [id], onDelete: Cascade)
+ * }
+ * /// Optional: link check-ins to root sins or vices for tracking progress
+ * model Vice {
+ * id          Int      @id @default(autoincrement())
+ * name        String
+ * description String?
+ * createdAt   DateTime @default(now())
+ * updatedAt   DateTime @updatedAt
+ * userGoals UserGoalVice[]
+ * }
+ * model UserGoalVice {
+ * id         Int @id @default(autoincrement())
+ * userGoalId Int
+ * viceId     Int
+ * userGoal UserGoal @relation(fields: [userGoalId], references: [id], onDelete: Cascade)
+ * vice     Vice     @relation(fields: [viceId], references: [id], onDelete: Cascade)
+ * }
+ * /// --------------------
+ * /// Collaboration / Groups
+ * /// --------------------
+ * model Group {
+ * id          Int      @id @default(autoincrement())
+ * name        String
+ * description String?
+ * createdAt   DateTime @default(now())
+ * updatedAt   DateTime @updatedAt
+ * members    GroupMember[]
+ * checkIns   GroupCheckIn[]
+ * intentions Intention[]
+ * }
+ * model GroupMember {
+ * id       Int      @id @default(autoincrement())
+ * groupId  Int
+ * userId   Int
+ * role     String   @default("member") // "member", "leader", "mentor"
+ * joinedAt DateTime @default(now())
+ * group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+ * user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+ * }
+ * /// Optional group-level daily check-ins
+ * model GroupCheckIn {
+ * id        Int      @id @default(autoincrement())
+ * groupId   Int
+ * userId    Int
+ * date      DateTime
+ * notes     String?
+ * completed Boolean  @default(false)
+ * value     Float?
+ * group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+ * user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+ * }
+ * /// --------------------
+ * /// Messaging / Communication
+ * /// --------------------
+ * model Message {
+ * id         Int      @id @default(autoincrement())
+ * senderId   Int
+ * receiverId Int
+ * content    String
+ * read       Boolean  @default(false)
+ * createdAt  DateTime @default(now())
+ * updatedAt  DateTime @updatedAt
+ * sender   User @relation("sentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+ * receiver User @relation("receivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+ * }
+ * /// --------------------
+ * /// Notifications / Intentions
+ * /// --------------------
+ * model Intention {
+ * id        Int      @id @default(autoincrement())
+ * userId    Int
+ * groupId   Int?
+ * content   String
+ * createdAt DateTime @default(now())
+ * updatedAt DateTime @updatedAt
+ * user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+ * group Group? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+ * }
+ * /// --------------------
+ * /// Roles / Authorization
+ * /// --------------------
+ * model Role {
+ * id          Int        @id @default(autoincrement())
+ * name        String     @unique
+ * description String?
+ * users       UserRole[]
+ * }
+ * model UserRole {
+ * id     Int @id @default(autoincrement())
+ * userId Int
+ * roleId Int
+ * user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ * role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+ * }
+ * /// --------------------
+ * /// Content / Daily Readings
+ * /// --------------------
+ * model DailyReading {
+ * id        Int      @id @default(autoincrement())
+ * title     String
+ * content   String
+ * date      DateTime @unique
+ * link      String?
+ * createdAt DateTime @default(now())
+ * updatedAt DateTime @updatedAt
+ * }
+ */

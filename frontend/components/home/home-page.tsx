@@ -14,7 +14,7 @@ export default async function HomePage() {
         src="/logo.png"
         alt="Next.js logo"
         width={100}
-        height={20}
+        height={100}
         priority
       />
       {session?.user ? (

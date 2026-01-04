@@ -1,14 +1,4 @@
-import {
-  Book,
-  Calendar,
-  ChevronUp,
-  Home,
-  Inbox,
-  Search,
-  Settings,
-  User2,
-  Waves,
-} from "lucide-react";
+import { Book, ChevronUp, Home, Settings, User2, Waves } from "lucide-react";
 
 import {
   Sidebar,
@@ -26,7 +16,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+} from "@/components/ui/dropdown-menu";
+import { auth } from "@/auth";
 
 // Menu items.
 const items = [
@@ -45,11 +36,11 @@ const items = [
     url: "/daily-readings",
     icon: Book,
   },
-  {
-    title: "Search",
-    url: "/search",
-    icon: Search,
-  },
+  // {
+  //   title: "Search",
+  //   url: "/search",
+  //   icon: Search,
+  // },
   {
     title: "Settings",
     url: "/settings",
@@ -57,7 +48,10 @@ const items = [
   },
 ];
 
-export function AppSidebar() {
+export default async function AppSidebar() {
+  const session = await auth();
+  const username = session?.user?.name;
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -85,7 +79,7 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> Username
+                  <User2 /> {username}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
