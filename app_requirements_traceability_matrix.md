@@ -5,14 +5,9 @@
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | 1 | Tracking | Daily tracking of asceticism activities. | User Req. | To Do | Highest | Requires structured DB (RDBMS) for logging. |
 | 2 | Content | Integrate Daily Mass Readings & Reflection Prompt. | Suggested | To Do | Highest | Requires API for liturgical readings. Implement Caching of this |
-| 3 | Frontend | Use Next.js/TypeScript/React. | User Req. | To Do | Highest | Frontend stack decision made. |
-| 4 | Backend | Use Python FastAPI. | User Req. | To Do | Highest | Backend stack decision made. For auth and users: `fastapi-users` library |
-| 5 | Data | Use a Structured (RDBMS) database (PostgreSQL/MySQL). | Architect | To Do | Highest | Ensures data integrity and complex querying for social features. |
-| 6 | Deployment | Scalable, cost-effective deployment strategy (e.g., Cloud Run). | Architect | To Do | Highest | Docker containerization of FastAPI needed. |
-| 7 | Deployment | Create CI/CD pipelines | Architect | To Do | Medium | Need this to ensure stable development and deployment |
-| 8 | Backend | Caching for the API | Architect | To Do | Highest | Redis + aioredis |
-| 9 | Foundation | User Authentication and authorization | User Req. | To Do | Highest | Need simple auth for users to log in and out using username and password and then also using OAuth with Google. Also the API needs to be protected with authentication (JWT tokens) |
-| 10 | Foundation | User Authorization | User Req. | To Do | High | Need to implement role-based authorization for users. |
+| 3 | Foundation | Caching for the API | Architect | To Do | Highest | Redis + aioredis |
+| 4 | Foundation | User Authentication and authorization | User Req. | To Do | Highest | Need simple auth for users to log in and out using username and password and then also using OAuth with Google. Also the API needs to be protected with authentication (JWT tokens) |
+| 5 | Foundation | User Authorization | User Req. | To Do | High | Need to implement role-based authorization for users. |
 ---
 
 ## Stretch Goals Table
