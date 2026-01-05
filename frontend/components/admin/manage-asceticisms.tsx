@@ -68,13 +68,33 @@ import { Spinner } from "@/components/ui/spinner";
 
 // Predefined categories with icons
 const CATEGORIES = [
-  { value: "fasting", label: "Fasting", icon: Utensils, color: "text-orange-500" },
+  {
+    value: "fasting",
+    label: "Fasting",
+    icon: Utensils,
+    color: "text-orange-500",
+  },
   { value: "prayer", label: "Prayer", icon: Heart, color: "text-rose-500" },
-  { value: "meditation", label: "Meditation", icon: Brain, color: "text-purple-500" },
+  {
+    value: "meditation",
+    label: "Meditation",
+    icon: Brain,
+    color: "text-purple-500",
+  },
   { value: "sleep", label: "Sleep", icon: Moon, color: "text-indigo-500" },
   { value: "reading", label: "Reading", icon: Book, color: "text-blue-500" },
-  { value: "exercise", label: "Exercise", icon: Dumbbell, color: "text-green-500" },
-  { value: "cold-exposure", label: "Cold Exposure", icon: Droplet, color: "text-cyan-500" },
+  {
+    value: "exercise",
+    label: "Exercise",
+    icon: Dumbbell,
+    color: "text-green-500",
+  },
+  {
+    value: "cold-exposure",
+    label: "Cold Exposure",
+    icon: Droplet,
+    color: "text-cyan-500",
+  },
   { value: "nature", label: "Nature", icon: Leaf, color: "text-emerald-500" },
   { value: "energy", label: "Energy", icon: Zap, color: "text-yellow-500" },
   { value: "other", label: "Other", icon: Sparkles, color: "text-gray-500" },
@@ -91,16 +111,22 @@ export function ManageAsceticismsPage() {
   const [asceticisms, setAsceticisms] = useState<Asceticism[]>([]);
   const [loading, setLoading] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editingAsceticism, setEditingAsceticism] = useState<Asceticism | null>(null);
+  const [editingAsceticism, setEditingAsceticism] = useState<Asceticism | null>(
+    null
+  );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [asceticismToDelete, setAsceticismToDelete] = useState<number | null>(null);
+  const [asceticismToDelete, setAsceticismToDelete] = useState<number | null>(
+    null
+  );
 
   // Form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [icon, setIcon] = useState("");
-  const [trackingType, setTrackingType] = useState<"BOOLEAN" | "NUMERIC" | "TEXT">("BOOLEAN");
+  const [trackingType, setTrackingType] = useState<
+    "BOOLEAN" | "NUMERIC" | "TEXT"
+  >("BOOLEAN");
 
   useEffect(() => {
     loadAsceticisms();
@@ -227,7 +253,8 @@ export function ManageAsceticismsPage() {
         <div>
           <h1 className="text-3xl font-bold">Manage Practice Templates</h1>
           <p className="text-muted-foreground">
-            Create and manage asceticism templates that users can browse and add to their practices
+            Create and manage asceticism templates that users can browse and add
+            to their practices
           </p>
         </div>
         <Button onClick={handleCreateClick}>
@@ -246,11 +273,15 @@ export function ManageAsceticismsPage() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
-                    <div className={`p-2 bg-primary/10 rounded-lg ${colorClass}`}>
+                    <div
+                      className={`p-2 bg-primary/10 rounded-lg ${colorClass}`}
+                    >
                       <CategoryIcon className="h-5 w-5" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg">{asceticism.title}</CardTitle>
+                      <CardTitle className="text-lg">
+                        {asceticism.title}
+                      </CardTitle>
                       <CardDescription className="mt-1">
                         {asceticism.description || "No description"}
                       </CardDescription>
@@ -310,7 +341,9 @@ export function ManageAsceticismsPage() {
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingAsceticism ? "Edit Asceticism Template" : "Create Asceticism Template"}
+              {editingAsceticism
+                ? "Edit Asceticism Template"
+                : "Create Asceticism Template"}
             </DialogTitle>
             <DialogDescription>
               {editingAsceticism
@@ -367,7 +400,9 @@ export function ManageAsceticismsPage() {
               <Label htmlFor="tracking-type">Tracking Type *</Label>
               <Select
                 value={trackingType}
-                onValueChange={(value) => setTrackingType(value as "BOOLEAN" | "NUMERIC" | "TEXT")}
+                onValueChange={(value) =>
+                  setTrackingType(value as "BOOLEAN" | "NUMERIC" | "TEXT")
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select tracking type" />
@@ -419,13 +454,16 @@ export function ManageAsceticismsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete this asceticism template. Users who have already
-              added this practice will keep it, but new users won't be able to browse and add it.
+              This will permanently delete this asceticism template. Users who
+              have already added this practice will keep it, but new users won't
+              be able to browse and add it.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
