@@ -199,7 +199,7 @@ export default function DailyReadingsPage() {
 
       {/* Inspirational Quotes */}
       <Card className="border-l-4 border-l-primary">
-        <CardContent className="pt-6">
+        <CardContent>
           <blockquote className="space-y-4 italic text-muted-foreground">
             <p className="text-lg">
               &ldquo;I am not here to understand everything; I am here to be
