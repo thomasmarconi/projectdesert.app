@@ -108,6 +108,14 @@ export default function AsceticismsPage() {
     "BOOLEAN"
   );
 
+  // Delete confirmation dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteAsceticismId, setDeleteAsceticismId] = useState<number | null>(
+    null
+  );
+  const [deleteAsceticismTitle, setDeleteAsceticismTitle] =
+    useState<string>("");
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -241,12 +249,22 @@ export default function AsceticismsPage() {
     }
   }
 
-  async function handleLeave(userAsceticismId: number, title: string) {
+  function handleLeaveClick(userAsceticismId: number, title: string) {
+    setDeleteAsceticismId(userAsceticismId);
+    setDeleteAsceticismTitle(title);
+    setDeleteDialogOpen(true);
+  }
+
+  async function handleLeaveConfirm() {
+    if (!deleteAsceticismId) return;
+
     try {
-      await leaveAsceticism(userAsceticismId);
-      toast.success(`Removed "${title}" from your commitments`);
-      fetchData();
+      await leaveAsceticism(deleteAsceticismId);
+      toast.success(`Removed "${deleteAsceticismTitle}" from your commitments`);
+      setDeleteDialogOpen(false);
+      await fetchData();
     } catch (e) {
+      console.error("Error leaving asceticism:", e);
       toast.error("Failed to remove commitment.");
     }
   }
@@ -392,7 +410,7 @@ export default function AsceticismsPage() {
                         className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleLeave(
+                          handleLeaveClick(
                             ua.id,
                             ua.asceticism?.title || "this practice"
                           );
@@ -780,6 +798,36 @@ export default function AsceticismsPage() {
             </Button>
             <Button onClick={handleLogConfirm} className="h-10 px-6">
               Log Progress
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader className="space-y-3">
+            <DialogTitle className="text-xl">Remove Commitment?</DialogTitle>
+            <DialogDescription className="text-base">
+              Are you sure you want to remove "{deleteAsceticismTitle}" from
+              your commitments? This action will archive the commitment and its
+              progress.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              className="h-10 px-6"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleLeaveConfirm}
+              className="h-10 px-6"
+            >
+              Remove
             </Button>
           </DialogFooter>
         </DialogContent>

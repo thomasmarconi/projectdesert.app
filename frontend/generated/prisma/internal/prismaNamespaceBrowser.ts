@@ -58,6 +58,8 @@ export const ModelName = {
   Asceticism: 'Asceticism',
   UserAsceticism: 'UserAsceticism',
   AsceticismLog: 'AsceticismLog',
+  AsceticismPackage: 'AsceticismPackage',
+  PackageItem: 'PackageItem',
   Program: 'Program',
   ProgramItem: 'ProgramItem',
   UserProgram: 'UserProgram',
@@ -178,6 +180,32 @@ export const AsceticismLogScalarFieldEnum = {
 } as const
 
 export type AsceticismLogScalarFieldEnum = (typeof AsceticismLogScalarFieldEnum)[keyof typeof AsceticismLogScalarFieldEnum]
+
+
+export const AsceticismPackageScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  creatorId: 'creatorId',
+  isPublished: 'isPublished',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AsceticismPackageScalarFieldEnum = (typeof AsceticismPackageScalarFieldEnum)[keyof typeof AsceticismPackageScalarFieldEnum]
+
+
+export const PackageItemScalarFieldEnum = {
+  id: 'id',
+  packageId: 'packageId',
+  asceticismId: 'asceticismId',
+  order: 'order',
+  notes: 'notes',
+  metadata: 'metadata'
+} as const
+
+export type PackageItemScalarFieldEnum = (typeof PackageItemScalarFieldEnum)[keyof typeof PackageItemScalarFieldEnum]
 
 
 export const ProgramScalarFieldEnum = {

@@ -162,7 +162,11 @@ export async function leaveAsceticism(userAsceticismId: number): Promise<void> {
   const res = await fetch(`${API_URL}/asceticisms/leave/${userAsceticismId}`, {
     method: "DELETE",
   });
-  if (!res.ok) throw new Error("Failed to leave asceticism");
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("Leave asceticism error:", res.status, errorText);
+    throw new Error(`Failed to leave asceticism: ${errorText}`);
+  }
 }
 
 export async function updateUserAsceticism(

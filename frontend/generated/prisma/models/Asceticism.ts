@@ -266,6 +266,7 @@ export type AsceticismWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Asceticism"> | Date | string
   userAsceticisms?: Prisma.UserAsceticismListRelationFilter
   programItems?: Prisma.ProgramItemListRelationFilter
+  packageItems?: Prisma.PackageItemListRelationFilter
   creator?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
@@ -283,6 +284,7 @@ export type AsceticismOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   userAsceticisms?: Prisma.UserAsceticismOrderByRelationAggregateInput
   programItems?: Prisma.ProgramItemOrderByRelationAggregateInput
+  packageItems?: Prisma.PackageItemOrderByRelationAggregateInput
   creator?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -303,6 +305,7 @@ export type AsceticismWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Asceticism"> | Date | string
   userAsceticisms?: Prisma.UserAsceticismListRelationFilter
   programItems?: Prisma.ProgramItemListRelationFilter
+  packageItems?: Prisma.PackageItemListRelationFilter
   creator?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id">
 
@@ -354,6 +357,7 @@ export type AsceticismCreateInput = {
   updatedAt?: Date | string
   userAsceticisms?: Prisma.UserAsceticismCreateNestedManyWithoutAsceticismInput
   programItems?: Prisma.ProgramItemCreateNestedManyWithoutAsceticismInput
+  packageItems?: Prisma.PackageItemCreateNestedManyWithoutAsceticismInput
   creator?: Prisma.UserCreateNestedOneWithoutCreatedAsceticismsInput
 }
 
@@ -371,6 +375,7 @@ export type AsceticismUncheckedCreateInput = {
   updatedAt?: Date | string
   userAsceticisms?: Prisma.UserAsceticismUncheckedCreateNestedManyWithoutAsceticismInput
   programItems?: Prisma.ProgramItemUncheckedCreateNestedManyWithoutAsceticismInput
+  packageItems?: Prisma.PackageItemUncheckedCreateNestedManyWithoutAsceticismInput
 }
 
 export type AsceticismUpdateInput = {
@@ -385,6 +390,7 @@ export type AsceticismUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userAsceticisms?: Prisma.UserAsceticismUpdateManyWithoutAsceticismNestedInput
   programItems?: Prisma.ProgramItemUpdateManyWithoutAsceticismNestedInput
+  packageItems?: Prisma.PackageItemUpdateManyWithoutAsceticismNestedInput
   creator?: Prisma.UserUpdateOneWithoutCreatedAsceticismsNestedInput
 }
 
@@ -402,6 +408,7 @@ export type AsceticismUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userAsceticisms?: Prisma.UserAsceticismUncheckedUpdateManyWithoutAsceticismNestedInput
   programItems?: Prisma.ProgramItemUncheckedUpdateManyWithoutAsceticismNestedInput
+  packageItems?: Prisma.PackageItemUncheckedUpdateManyWithoutAsceticismNestedInput
 }
 
 export type AsceticismCreateManyInput = {
@@ -577,6 +584,20 @@ export type AsceticismUpdateOneRequiredWithoutUserAsceticismsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AsceticismUpdateToOneWithWhereWithoutUserAsceticismsInput, Prisma.AsceticismUpdateWithoutUserAsceticismsInput>, Prisma.AsceticismUncheckedUpdateWithoutUserAsceticismsInput>
 }
 
+export type AsceticismCreateNestedOneWithoutPackageItemsInput = {
+  create?: Prisma.XOR<Prisma.AsceticismCreateWithoutPackageItemsInput, Prisma.AsceticismUncheckedCreateWithoutPackageItemsInput>
+  connectOrCreate?: Prisma.AsceticismCreateOrConnectWithoutPackageItemsInput
+  connect?: Prisma.AsceticismWhereUniqueInput
+}
+
+export type AsceticismUpdateOneRequiredWithoutPackageItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.AsceticismCreateWithoutPackageItemsInput, Prisma.AsceticismUncheckedCreateWithoutPackageItemsInput>
+  connectOrCreate?: Prisma.AsceticismCreateOrConnectWithoutPackageItemsInput
+  upsert?: Prisma.AsceticismUpsertWithoutPackageItemsInput
+  connect?: Prisma.AsceticismWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AsceticismUpdateToOneWithWhereWithoutPackageItemsInput, Prisma.AsceticismUpdateWithoutPackageItemsInput>, Prisma.AsceticismUncheckedUpdateWithoutPackageItemsInput>
+}
+
 export type AsceticismCreateNestedOneWithoutProgramItemsInput = {
   create?: Prisma.XOR<Prisma.AsceticismCreateWithoutProgramItemsInput, Prisma.AsceticismUncheckedCreateWithoutProgramItemsInput>
   connectOrCreate?: Prisma.AsceticismCreateOrConnectWithoutProgramItemsInput
@@ -603,6 +624,7 @@ export type AsceticismCreateWithoutCreatorInput = {
   updatedAt?: Date | string
   userAsceticisms?: Prisma.UserAsceticismCreateNestedManyWithoutAsceticismInput
   programItems?: Prisma.ProgramItemCreateNestedManyWithoutAsceticismInput
+  packageItems?: Prisma.PackageItemCreateNestedManyWithoutAsceticismInput
 }
 
 export type AsceticismUncheckedCreateWithoutCreatorInput = {
@@ -618,6 +640,7 @@ export type AsceticismUncheckedCreateWithoutCreatorInput = {
   updatedAt?: Date | string
   userAsceticisms?: Prisma.UserAsceticismUncheckedCreateNestedManyWithoutAsceticismInput
   programItems?: Prisma.ProgramItemUncheckedCreateNestedManyWithoutAsceticismInput
+  packageItems?: Prisma.PackageItemUncheckedCreateNestedManyWithoutAsceticismInput
 }
 
 export type AsceticismCreateOrConnectWithoutCreatorInput = {
@@ -674,6 +697,7 @@ export type AsceticismCreateWithoutUserAsceticismsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   programItems?: Prisma.ProgramItemCreateNestedManyWithoutAsceticismInput
+  packageItems?: Prisma.PackageItemCreateNestedManyWithoutAsceticismInput
   creator?: Prisma.UserCreateNestedOneWithoutCreatedAsceticismsInput
 }
 
@@ -690,6 +714,7 @@ export type AsceticismUncheckedCreateWithoutUserAsceticismsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   programItems?: Prisma.ProgramItemUncheckedCreateNestedManyWithoutAsceticismInput
+  packageItems?: Prisma.PackageItemUncheckedCreateNestedManyWithoutAsceticismInput
 }
 
 export type AsceticismCreateOrConnectWithoutUserAsceticismsInput = {
@@ -719,6 +744,7 @@ export type AsceticismUpdateWithoutUserAsceticismsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   programItems?: Prisma.ProgramItemUpdateManyWithoutAsceticismNestedInput
+  packageItems?: Prisma.PackageItemUpdateManyWithoutAsceticismNestedInput
   creator?: Prisma.UserUpdateOneWithoutCreatedAsceticismsNestedInput
 }
 
@@ -735,6 +761,85 @@ export type AsceticismUncheckedUpdateWithoutUserAsceticismsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   programItems?: Prisma.ProgramItemUncheckedUpdateManyWithoutAsceticismNestedInput
+  packageItems?: Prisma.PackageItemUncheckedUpdateManyWithoutAsceticismNestedInput
+}
+
+export type AsceticismCreateWithoutPackageItemsInput = {
+  title: string
+  description?: string | null
+  category: string
+  icon?: string | null
+  isTemplate?: boolean
+  type?: $Enums.TrackingType
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userAsceticisms?: Prisma.UserAsceticismCreateNestedManyWithoutAsceticismInput
+  programItems?: Prisma.ProgramItemCreateNestedManyWithoutAsceticismInput
+  creator?: Prisma.UserCreateNestedOneWithoutCreatedAsceticismsInput
+}
+
+export type AsceticismUncheckedCreateWithoutPackageItemsInput = {
+  id?: number
+  title: string
+  description?: string | null
+  category: string
+  icon?: string | null
+  isTemplate?: boolean
+  creatorId?: number | null
+  type?: $Enums.TrackingType
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userAsceticisms?: Prisma.UserAsceticismUncheckedCreateNestedManyWithoutAsceticismInput
+  programItems?: Prisma.ProgramItemUncheckedCreateNestedManyWithoutAsceticismInput
+}
+
+export type AsceticismCreateOrConnectWithoutPackageItemsInput = {
+  where: Prisma.AsceticismWhereUniqueInput
+  create: Prisma.XOR<Prisma.AsceticismCreateWithoutPackageItemsInput, Prisma.AsceticismUncheckedCreateWithoutPackageItemsInput>
+}
+
+export type AsceticismUpsertWithoutPackageItemsInput = {
+  update: Prisma.XOR<Prisma.AsceticismUpdateWithoutPackageItemsInput, Prisma.AsceticismUncheckedUpdateWithoutPackageItemsInput>
+  create: Prisma.XOR<Prisma.AsceticismCreateWithoutPackageItemsInput, Prisma.AsceticismUncheckedCreateWithoutPackageItemsInput>
+  where?: Prisma.AsceticismWhereInput
+}
+
+export type AsceticismUpdateToOneWithWhereWithoutPackageItemsInput = {
+  where?: Prisma.AsceticismWhereInput
+  data: Prisma.XOR<Prisma.AsceticismUpdateWithoutPackageItemsInput, Prisma.AsceticismUncheckedUpdateWithoutPackageItemsInput>
+}
+
+export type AsceticismUpdateWithoutPackageItemsInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTemplate?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  type?: Prisma.EnumTrackingTypeFieldUpdateOperationsInput | $Enums.TrackingType
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userAsceticisms?: Prisma.UserAsceticismUpdateManyWithoutAsceticismNestedInput
+  programItems?: Prisma.ProgramItemUpdateManyWithoutAsceticismNestedInput
+  creator?: Prisma.UserUpdateOneWithoutCreatedAsceticismsNestedInput
+}
+
+export type AsceticismUncheckedUpdateWithoutPackageItemsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTemplate?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  creatorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  type?: Prisma.EnumTrackingTypeFieldUpdateOperationsInput | $Enums.TrackingType
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userAsceticisms?: Prisma.UserAsceticismUncheckedUpdateManyWithoutAsceticismNestedInput
+  programItems?: Prisma.ProgramItemUncheckedUpdateManyWithoutAsceticismNestedInput
 }
 
 export type AsceticismCreateWithoutProgramItemsInput = {
@@ -748,6 +853,7 @@ export type AsceticismCreateWithoutProgramItemsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   userAsceticisms?: Prisma.UserAsceticismCreateNestedManyWithoutAsceticismInput
+  packageItems?: Prisma.PackageItemCreateNestedManyWithoutAsceticismInput
   creator?: Prisma.UserCreateNestedOneWithoutCreatedAsceticismsInput
 }
 
@@ -764,6 +870,7 @@ export type AsceticismUncheckedCreateWithoutProgramItemsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   userAsceticisms?: Prisma.UserAsceticismUncheckedCreateNestedManyWithoutAsceticismInput
+  packageItems?: Prisma.PackageItemUncheckedCreateNestedManyWithoutAsceticismInput
 }
 
 export type AsceticismCreateOrConnectWithoutProgramItemsInput = {
@@ -793,6 +900,7 @@ export type AsceticismUpdateWithoutProgramItemsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userAsceticisms?: Prisma.UserAsceticismUpdateManyWithoutAsceticismNestedInput
+  packageItems?: Prisma.PackageItemUpdateManyWithoutAsceticismNestedInput
   creator?: Prisma.UserUpdateOneWithoutCreatedAsceticismsNestedInput
 }
 
@@ -809,6 +917,7 @@ export type AsceticismUncheckedUpdateWithoutProgramItemsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userAsceticisms?: Prisma.UserAsceticismUncheckedUpdateManyWithoutAsceticismNestedInput
+  packageItems?: Prisma.PackageItemUncheckedUpdateManyWithoutAsceticismNestedInput
 }
 
 export type AsceticismCreateManyCreatorInput = {
@@ -836,6 +945,7 @@ export type AsceticismUpdateWithoutCreatorInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userAsceticisms?: Prisma.UserAsceticismUpdateManyWithoutAsceticismNestedInput
   programItems?: Prisma.ProgramItemUpdateManyWithoutAsceticismNestedInput
+  packageItems?: Prisma.PackageItemUpdateManyWithoutAsceticismNestedInput
 }
 
 export type AsceticismUncheckedUpdateWithoutCreatorInput = {
@@ -851,6 +961,7 @@ export type AsceticismUncheckedUpdateWithoutCreatorInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userAsceticisms?: Prisma.UserAsceticismUncheckedUpdateManyWithoutAsceticismNestedInput
   programItems?: Prisma.ProgramItemUncheckedUpdateManyWithoutAsceticismNestedInput
+  packageItems?: Prisma.PackageItemUncheckedUpdateManyWithoutAsceticismNestedInput
 }
 
 export type AsceticismUncheckedUpdateManyWithoutCreatorInput = {
@@ -874,11 +985,13 @@ export type AsceticismUncheckedUpdateManyWithoutCreatorInput = {
 export type AsceticismCountOutputType = {
   userAsceticisms: number
   programItems: number
+  packageItems: number
 }
 
 export type AsceticismCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   userAsceticisms?: boolean | AsceticismCountOutputTypeCountUserAsceticismsArgs
   programItems?: boolean | AsceticismCountOutputTypeCountProgramItemsArgs
+  packageItems?: boolean | AsceticismCountOutputTypeCountPackageItemsArgs
 }
 
 /**
@@ -905,6 +1018,13 @@ export type AsceticismCountOutputTypeCountProgramItemsArgs<ExtArgs extends runti
   where?: Prisma.ProgramItemWhereInput
 }
 
+/**
+ * AsceticismCountOutputType without action
+ */
+export type AsceticismCountOutputTypeCountPackageItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PackageItemWhereInput
+}
+
 
 export type AsceticismSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -920,6 +1040,7 @@ export type AsceticismSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   updatedAt?: boolean
   userAsceticisms?: boolean | Prisma.Asceticism$userAsceticismsArgs<ExtArgs>
   programItems?: boolean | Prisma.Asceticism$programItemsArgs<ExtArgs>
+  packageItems?: boolean | Prisma.Asceticism$packageItemsArgs<ExtArgs>
   creator?: boolean | Prisma.Asceticism$creatorArgs<ExtArgs>
   _count?: boolean | Prisma.AsceticismCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["asceticism"]>
@@ -972,6 +1093,7 @@ export type AsceticismOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type AsceticismInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   userAsceticisms?: boolean | Prisma.Asceticism$userAsceticismsArgs<ExtArgs>
   programItems?: boolean | Prisma.Asceticism$programItemsArgs<ExtArgs>
+  packageItems?: boolean | Prisma.Asceticism$packageItemsArgs<ExtArgs>
   creator?: boolean | Prisma.Asceticism$creatorArgs<ExtArgs>
   _count?: boolean | Prisma.AsceticismCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -987,6 +1109,7 @@ export type $AsceticismPayload<ExtArgs extends runtime.Types.Extensions.Internal
   objects: {
     userAsceticisms: Prisma.$UserAsceticismPayload<ExtArgs>[]
     programItems: Prisma.$ProgramItemPayload<ExtArgs>[]
+    packageItems: Prisma.$PackageItemPayload<ExtArgs>[]
     creator: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1397,6 +1520,7 @@ export interface Prisma__AsceticismClient<T, Null = never, ExtArgs extends runti
   readonly [Symbol.toStringTag]: "PrismaPromise"
   userAsceticisms<T extends Prisma.Asceticism$userAsceticismsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asceticism$userAsceticismsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserAsceticismPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   programItems<T extends Prisma.Asceticism$programItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asceticism$programItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProgramItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  packageItems<T extends Prisma.Asceticism$packageItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asceticism$packageItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PackageItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   creator<T extends Prisma.Asceticism$creatorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asceticism$creatorArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1879,6 +2003,30 @@ export type Asceticism$programItemsArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.ProgramItemScalarFieldEnum | Prisma.ProgramItemScalarFieldEnum[]
+}
+
+/**
+ * Asceticism.packageItems
+ */
+export type Asceticism$packageItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PackageItem
+   */
+  select?: Prisma.PackageItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PackageItem
+   */
+  omit?: Prisma.PackageItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PackageItemInclude<ExtArgs> | null
+  where?: Prisma.PackageItemWhereInput
+  orderBy?: Prisma.PackageItemOrderByWithRelationInput | Prisma.PackageItemOrderByWithRelationInput[]
+  cursor?: Prisma.PackageItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PackageItemScalarFieldEnum | Prisma.PackageItemScalarFieldEnum[]
 }
 
 /**

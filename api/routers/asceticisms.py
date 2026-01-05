@@ -252,7 +252,7 @@ async def log_daily_progress(log: LogCreate):
 @router.delete("/asceticisms/leave/{user_asceticism_id}", tags=["asceticisms"])
 async def leave_asceticism(user_asceticism_id: int):
     """
-    Leave/remove an asceticism commitment by setting status to INACTIVE.
+    Leave/remove an asceticism commitment by setting status to ARCHIVED.
     """
     # Check if the user asceticism exists
     user_asceticism = await db.userasceticism.find_unique(
@@ -262,9 +262,9 @@ async def leave_asceticism(user_asceticism_id: int):
     if not user_asceticism:
         raise HTTPException(status_code=404, detail="User asceticism not found")
 
-    # Update status to INACTIVE instead of deleting
+    # Update status to ARCHIVED instead of deleting
     await db.userasceticism.update(
-        where={"id": user_asceticism_id}, data={"status": AsceticismStatus.INACTIVE}
+        where={"id": user_asceticism_id}, data={"status": AsceticismStatus.ARCHIVED}
     )
 
     return {"message": "Successfully left asceticism"}

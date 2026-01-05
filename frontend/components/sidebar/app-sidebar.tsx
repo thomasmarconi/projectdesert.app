@@ -1,4 +1,13 @@
-import { Book, ChevronUp, Home, Settings, User2, Waves } from "lucide-react";
+import {
+  Book,
+  ChevronUp,
+  Home,
+  Settings,
+  User2,
+  Waves,
+  Package,
+  ShieldCheck,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -32,6 +41,11 @@ const items = [
     icon: Waves,
   },
   {
+    title: "Browse Packages",
+    url: "/packages",
+    icon: Package,
+  },
+  {
     title: "Daily Readings",
     url: "/daily-readings",
     icon: Book,
@@ -48,9 +62,28 @@ const items = [
   },
 ];
 
+const adminItems = [
+  {
+    title: "Admin Panel",
+    url: "/admin",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Manage Practices",
+    url: "/admin/asceticisms",
+    icon: Waves,
+  },
+  {
+    title: "Manage Packages",
+    url: "/admin/packages",
+    icon: Package,
+  },
+];
+
 export default async function AppSidebar() {
   const session = await auth();
   const username = session?.user?.name;
+  const isAdmin = session?.user?.role === "ADMIN";
 
   return (
     <Sidebar>
@@ -72,6 +105,25 @@ export default async function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        {isAdmin && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Admin</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <a href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>

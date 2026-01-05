@@ -96,6 +96,7 @@ model Asceticism {
 
   userAsceticisms UserAsceticism[]
   programItems    ProgramItem[]
+  packageItems    PackageItem[]
 
   creator User? @relation("CreatedAsceticisms", fields: [creatorId], references: [id])
 }
@@ -144,6 +145,48 @@ model AsceticismLog {
   userAsceticism UserAsceticism @relation(fields: [userAsceticismId], references: [id], onDelete: Cascade)
 
   @@unique([userAsceticismId, date])
+}
+
+/// --------------------
+/// Asceticism Packages
+/// --------------------
+
+// Published collections of asceticisms that users can browse and add
+model AsceticismPackage {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String?
+  creatorId   Int
+  isPublished Boolean @default(false)
+
+  metadata Json? // Extensibility: tags, difficulty rating, category
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items PackageItem[]
+
+  @@map("asceticism_packages")
+}
+
+// Join table linking packages to asceticisms
+model PackageItem {
+  id           Int @id @default(autoincrement())
+  packageId    Int
+  asceticismId Int
+
+  // Order in the package
+  order Int @default(0)
+
+  // Optional customization for this package
+  notes    String?
+  metadata Json?
+
+  package    AsceticismPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  asceticism Asceticism        @relation(fields: [asceticismId], references: [id], onDelete: Cascade)
+
+  @@unique([packageId, asceticismId])
+  @@map("package_items")
 }
 
 /// --------------------

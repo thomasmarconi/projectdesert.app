@@ -53,6 +53,16 @@ export type UserAsceticism = Prisma.UserAsceticismModel
  */
 export type AsceticismLog = Prisma.AsceticismLogModel
 /**
+ * Model AsceticismPackage
+ * 
+ */
+export type AsceticismPackage = Prisma.AsceticismPackageModel
+/**
+ * Model PackageItem
+ * 
+ */
+export type PackageItem = Prisma.PackageItemModel
+/**
  * Model Program
  * 
  */

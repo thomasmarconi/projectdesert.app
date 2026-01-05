@@ -391,6 +391,8 @@ export const ModelName = {
   Asceticism: 'Asceticism',
   UserAsceticism: 'UserAsceticism',
   AsceticismLog: 'AsceticismLog',
+  AsceticismPackage: 'AsceticismPackage',
+  PackageItem: 'PackageItem',
   Program: 'Program',
   ProgramItem: 'ProgramItem',
   UserProgram: 'UserProgram',
@@ -411,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "verificationToken" | "account" | "session" | "user" | "asceticism" | "userAsceticism" | "asceticismLog" | "program" | "programItem" | "userProgram" | "group" | "groupMember"
+    modelProps: "verificationToken" | "account" | "session" | "user" | "asceticism" | "userAsceticism" | "asceticismLog" | "asceticismPackage" | "packageItem" | "program" | "programItem" | "userProgram" | "group" | "groupMember"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -933,6 +935,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AsceticismPackage: {
+      payload: Prisma.$AsceticismPackagePayload<ExtArgs>
+      fields: Prisma.AsceticismPackageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AsceticismPackageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AsceticismPackagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AsceticismPackageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AsceticismPackagePayload>
+        }
+        findFirst: {
+          args: Prisma.AsceticismPackageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AsceticismPackagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AsceticismPackageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AsceticismPackagePayload>
+        }
+        findMany: {
+          args: Prisma.AsceticismPackageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AsceticismPackagePayload>[]
+        }
+        create: {
+          args: Prisma.AsceticismPackageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AsceticismPackagePayload>
+        }
+        createMany: {
+          args: Prisma.AsceticismPackageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AsceticismPackageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AsceticismPackagePayload>[]
+        }
+        delete: {
+          args: Prisma.AsceticismPackageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AsceticismPackagePayload>
+        }
+        update: {
+          args: Prisma.AsceticismPackageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AsceticismPackagePayload>
+        }
+        deleteMany: {
+          args: Prisma.AsceticismPackageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AsceticismPackageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AsceticismPackageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AsceticismPackagePayload>[]
+        }
+        upsert: {
+          args: Prisma.AsceticismPackageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AsceticismPackagePayload>
+        }
+        aggregate: {
+          args: Prisma.AsceticismPackageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAsceticismPackage>
+        }
+        groupBy: {
+          args: Prisma.AsceticismPackageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AsceticismPackageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AsceticismPackageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AsceticismPackageCountAggregateOutputType> | number
+        }
+      }
+    }
+    PackageItem: {
+      payload: Prisma.$PackageItemPayload<ExtArgs>
+      fields: Prisma.PackageItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PackageItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PackageItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PackageItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PackageItemPayload>
+        }
+        findFirst: {
+          args: Prisma.PackageItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PackageItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PackageItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PackageItemPayload>
+        }
+        findMany: {
+          args: Prisma.PackageItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PackageItemPayload>[]
+        }
+        create: {
+          args: Prisma.PackageItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PackageItemPayload>
+        }
+        createMany: {
+          args: Prisma.PackageItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PackageItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PackageItemPayload>[]
+        }
+        delete: {
+          args: Prisma.PackageItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PackageItemPayload>
+        }
+        update: {
+          args: Prisma.PackageItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PackageItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.PackageItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PackageItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PackageItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PackageItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.PackageItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PackageItemPayload>
+        }
+        aggregate: {
+          args: Prisma.PackageItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePackageItem>
+        }
+        groupBy: {
+          args: Prisma.PackageItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PackageItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PackageItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PackageItemCountAggregateOutputType> | number
+        }
+      }
+    }
     Program: {
       payload: Prisma.$ProgramPayload<ExtArgs>
       fields: Prisma.ProgramFieldRefs
@@ -1441,6 +1591,32 @@ export const AsceticismLogScalarFieldEnum = {
 export type AsceticismLogScalarFieldEnum = (typeof AsceticismLogScalarFieldEnum)[keyof typeof AsceticismLogScalarFieldEnum]
 
 
+export const AsceticismPackageScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  creatorId: 'creatorId',
+  isPublished: 'isPublished',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AsceticismPackageScalarFieldEnum = (typeof AsceticismPackageScalarFieldEnum)[keyof typeof AsceticismPackageScalarFieldEnum]
+
+
+export const PackageItemScalarFieldEnum = {
+  id: 'id',
+  packageId: 'packageId',
+  asceticismId: 'asceticismId',
+  order: 'order',
+  notes: 'notes',
+  metadata: 'metadata'
+} as const
+
+export type PackageItemScalarFieldEnum = (typeof PackageItemScalarFieldEnum)[keyof typeof PackageItemScalarFieldEnum]
+
+
 export const ProgramScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -1794,6 +1970,8 @@ export type GlobalOmitConfig = {
   asceticism?: Prisma.AsceticismOmit
   userAsceticism?: Prisma.UserAsceticismOmit
   asceticismLog?: Prisma.AsceticismLogOmit
+  asceticismPackage?: Prisma.AsceticismPackageOmit
+  packageItem?: Prisma.PackageItemOmit
   program?: Prisma.ProgramOmit
   programItem?: Prisma.ProgramItemOmit
   userProgram?: Prisma.UserProgramOmit
