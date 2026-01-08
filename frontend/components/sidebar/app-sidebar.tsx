@@ -7,6 +7,8 @@ import {
   Waves,
   Package,
   ShieldCheck,
+  LogOut,
+  LogIn,
 } from "lucide-react";
 
 import {
@@ -25,8 +27,12 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { auth } from "@/auth";
+import SidebarSignIn from "@/components/auth/sidebar-sign-in";
+import { SidebarSignOut } from "@/components/auth/sidebar-sign-out";
 
 // Menu items.
 const items = [
@@ -82,8 +88,21 @@ const adminItems = [
 
 export default async function AppSidebar() {
   const session = await auth();
-  const username = session?.user?.name;
-  const isAdmin = session?.user?.role === "ADMIN";
+  const user = session?.user;
+  const username = user?.name || "Guest";
+  const userEmail = user?.email;
+  const userImage = user?.image;
+  const isAdmin = user?.role === "ADMIN";
+
+  // Get initials for avatar fallback
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   return (
     <Sidebar>
@@ -128,29 +147,56 @@ export default async function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  <User2 /> {username}
-                  <ChevronUp className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="top"
-                className="w-[--radix-popper-anchor-width]"
-              >
-                <DropdownMenuItem>
-                  <a href="/settings">
-                    <span>Settings</span>
-                  </a>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <a href="/sign-out">
-                    <span>Sign out</span>
-                  </a>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {session ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton
+                    size="lg"
+                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  >
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage
+                        src={userImage || undefined}
+                        alt={username}
+                      />
+                      <AvatarFallback className="rounded-lg">
+                        {getInitials(username)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-semibold">{username}</span>
+                      <span className="truncate text-xs text-muted-foreground">
+                        {userEmail}
+                      </span>
+                    </div>
+                    <ChevronUp className="ml-auto size-4" />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                  side="top"
+                  align="end"
+                  sideOffset={4}
+                >
+                  <DropdownMenuItem asChild>
+                    <a href="/settings" className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </a>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <div className="p-1">
+                    <SidebarSignOut />
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <SidebarMenuButton size="lg" asChild>
+                <div className="w-full">
+                  <SidebarSignIn />
+                </div>
+              </SidebarMenuButton>
+            )}
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

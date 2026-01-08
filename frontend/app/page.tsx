@@ -1,5 +1,10 @@
 import HomePage from "@/components/home/home-page";
+import { SidebarInset } from "@/components/ui/sidebar";
 
 export default function Page() {
-  return <HomePage />;
+  return (
+    <SidebarInset>
+      <HomePage />
+    </SidebarInset>
+  );
 }
