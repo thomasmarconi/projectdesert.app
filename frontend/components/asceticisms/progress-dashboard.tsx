@@ -87,7 +87,7 @@ export default function ProgressDashboard() {
 
   const [progressData, setProgressData] = useState<AsceticismProgress[]>([]);
   const [loading, setLoading] = useState(true);
-  const [timePeriod, setTimePeriod] = useState<TimePeriod>("90d");
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>("7d");
   const [hoveredDay, setHoveredDay] = useState<{
     date: string;
     log: ProgressLog | null;
