@@ -1,20 +1,21 @@
-import { getAllUsers, getCurrentUser } from "@/lib/services/adminService";
+import { getAllUsers } from "@/lib/services/adminService";
 import UsersTable from "@/components/admin/users-table";
 import { redirect } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ShieldAlert } from "lucide-react";
 import { UserRole } from "@/lib/types/admin";
+import { auth } from "@/auth";
 
 export default async function AdminPage() {
-  const currentUser = await getCurrentUser();
+  const session = await auth();
 
   // Check if user is logged in
-  if (!currentUser) {
+  if (!session?.user) {
     redirect("/api/auth/signin");
   }
 
   // Check if user is banned
-  if (currentUser.isBanned) {
+  if (session.user.isBanned) {
     return (
       <div className="container mx-auto py-10">
         <Alert variant="destructive">
@@ -29,7 +30,7 @@ export default async function AdminPage() {
   }
 
   // Check if user is admin
-  if (currentUser.role !== UserRole.ADMIN) {
+  if (session.user.role !== UserRole.ADMIN) {
     return (
       <div className="container mx-auto py-10">
         <Alert variant="destructive">
@@ -58,7 +59,7 @@ export default async function AdminPage() {
         </p>
       </div>
 
-      <UsersTable users={users} currentUserId={currentUser.id} />
+      <UsersTable users={users} currentUserId={session.user.id} />
     </div>
   );
 }

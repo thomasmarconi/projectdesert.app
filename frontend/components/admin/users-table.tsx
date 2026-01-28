@@ -62,13 +62,13 @@ export default function UsersTable({ users, currentUserId }: UsersTableProps) {
       await updateUserRole(userId, newRole);
       setLocalUsers((prev) =>
         prev.map((user) =>
-          user.id === userId ? { ...user, role: newRole } : user
-        )
+          user.id === userId ? { ...user, role: newRole } : user,
+        ),
       );
       toast.success("User role updated successfully");
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to update role"
+        error instanceof Error ? error.message : "Failed to update role",
       );
     } finally {
       setIsUpdating(null);
@@ -90,17 +90,17 @@ export default function UsersTable({ users, currentUserId }: UsersTableProps) {
         prev.map((user) =>
           user.id === selectedUser.id
             ? { ...user, isBanned: !user.isBanned }
-            : user
-        )
+            : user,
+        ),
       );
       toast.success(
         selectedUser.isBanned
           ? "User unbanned successfully"
-          : "User banned successfully"
+          : "User banned successfully",
       );
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to update ban status"
+        error instanceof Error ? error.message : "Failed to update ban status",
       );
     } finally {
       setIsUpdating(null);
@@ -151,7 +151,7 @@ export default function UsersTable({ users, currentUserId }: UsersTableProps) {
   return (
     <>
       <Card className="border-none shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
+        <CardHeader className="bg-linear-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
           <CardTitle className="text-2xl">User Management</CardTitle>
           <CardDescription>
             Manage user roles and permissions across the platform
@@ -162,7 +162,7 @@ export default function UsersTable({ users, currentUserId }: UsersTableProps) {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead className="w-[300px]">User</TableHead>
+                  <TableHead className="w-75">User</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-center">Activity</TableHead>
@@ -183,7 +183,7 @@ export default function UsersTable({ users, currentUserId }: UsersTableProps) {
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 border-2 border-background shadow-sm">
                           <AvatarImage src={user.image || undefined} />
-                          <AvatarFallback className="bg-gradient-to-br from-purple-400 to-blue-400 text-white">
+                          <AvatarFallback className="bg-linear-to-br from-purple-400 to-blue-400 text-white">
                             {getInitials(user.name)}
                           </AvatarFallback>
                         </Avatar>
@@ -212,7 +212,7 @@ export default function UsersTable({ users, currentUserId }: UsersTableProps) {
                           isUpdating === user.id || user.id === currentUserId
                         }
                       >
-                        <SelectTrigger className="w-[140px]">
+                        <SelectTrigger className="w-35">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>

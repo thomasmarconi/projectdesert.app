@@ -1,21 +1,21 @@
 import { ManageAsceticismsPage } from "@/components/admin/manage-asceticisms";
-import { getCurrentUser } from "@/lib/services/adminService";
 import { redirect } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ShieldAlert } from "lucide-react";
 import { UserRole } from "@/lib/types/admin";
 import { SidebarInset } from "@/components/ui/sidebar";
+import { auth } from "@/auth";
 
 export default async function AdminManageAsceticismsPage() {
-  const currentUser = await getCurrentUser();
+  const session = await auth();
 
   // Check if user is logged in
-  if (!currentUser) {
+  if (!session?.user) {
     redirect("/api/auth/signin");
   }
 
   // Check if user is admin
-  if (currentUser.role !== UserRole.ADMIN) {
+  if (session.user.role !== UserRole.ADMIN) {
     return (
       <SidebarInset>
         <div className="container mx-auto p-6">
