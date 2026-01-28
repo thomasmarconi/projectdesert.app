@@ -88,10 +88,10 @@ export default function AsceticismsPage() {
   // Join dialog state
   const [joinDialogOpen, setJoinDialogOpen] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(
-    null
+    null,
   );
   const [joinStartDate, setJoinStartDate] = useState<Date | undefined>(
-    new Date()
+    new Date(),
   );
   const [joinEndDate, setJoinEndDate] = useState<Date | undefined>(undefined);
 
@@ -100,25 +100,25 @@ export default function AsceticismsPage() {
   const [editingAsceticism, setEditingAsceticism] =
     useState<UserAsceticism | null>(null);
   const [editStartDate, setEditStartDate] = useState<Date | undefined>(
-    undefined
+    undefined,
   );
   const [editEndDate, setEditEndDate] = useState<Date | undefined>(undefined);
 
   // Log dialog state for numeric and text types
   const [logDialogOpen, setLogDialogOpen] = useState(false);
   const [logUserAsceticismId, setLogUserAsceticismId] = useState<number | null>(
-    null
+    null,
   );
   const [logValue, setLogValue] = useState<string>("");
   const [logNotes, setLogNotes] = useState<string>("");
   const [logType, setLogType] = useState<"BOOLEAN" | "NUMERIC" | "TEXT">(
-    "BOOLEAN"
+    "BOOLEAN",
   );
 
   // Delete confirmation dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteAsceticismId, setDeleteAsceticismId] = useState<number | null>(
-    null
+    null,
   );
   const [deleteAsceticismTitle, setDeleteAsceticismTitle] =
     useState<string>("");
@@ -153,7 +153,7 @@ export default function AsceticismsPage() {
         const mine = await getUserAsceticisms(
           userId,
           startDate.toISOString(),
-          endDate.toISOString()
+          endDate.toISOString(),
         );
         setMyAsceticisms(mine);
       }
@@ -185,7 +185,7 @@ export default function AsceticismsPage() {
         selectedTemplateId,
         undefined,
         joinStartDate?.toISOString(),
-        joinEndDate?.toISOString()
+        joinEndDate?.toISOString(),
       );
       toast.success("Joined asceticism!");
       setJoinDialogOpen(false);
@@ -221,7 +221,7 @@ export default function AsceticismsPage() {
 
   async function handleLog(
     userAsceticismId: number,
-    type: "BOOLEAN" | "NUMERIC" | "TEXT"
+    type: "BOOLEAN" | "NUMERIC" | "TEXT",
   ) {
     // Always open dialog to allow notes for all types
     setLogUserAsceticismId(userAsceticismId);
@@ -363,7 +363,7 @@ export default function AsceticismsPage() {
     setCompletingAll(true);
     try {
       const booleanAsceticisms = myAsceticisms.filter(
-        (ua) => ua.asceticism?.type === "BOOLEAN" && !hasLoggedOnDate(ua)
+        (ua) => ua.asceticism?.type === "BOOLEAN" && !hasLoggedOnDate(ua),
       );
 
       if (booleanAsceticisms.length === 0) {
@@ -378,8 +378,8 @@ export default function AsceticismsPage() {
             userAsceticismId: ua.id,
             date,
             completed: true,
-          })
-        )
+          }),
+        ),
       );
 
       toast.success(`Completed ${booleanAsceticisms.length} practices!`);
@@ -509,8 +509,8 @@ export default function AsceticismsPage() {
                       <Button
                         variant="outline"
                         className={cn(
-                          "min-w-[180px] justify-start text-left font-normal h-8 text-sm",
-                          !viewingDate && "text-muted-foreground"
+                          "min-w-45 justify-start text-left font-normal h-8 text-sm",
+                          !viewingDate && "text-muted-foreground",
                         )}
                       >
                         <CalendarIcon className="mr-2 h-3.5 w-3.5" />
@@ -555,7 +555,7 @@ export default function AsceticismsPage() {
                 {isViewingToday() &&
                   myAsceticisms.some(
                     (ua) =>
-                      ua.asceticism?.type === "BOOLEAN" && !hasLoggedOnDate(ua)
+                      ua.asceticism?.type === "BOOLEAN" && !hasLoggedOnDate(ua),
                   ) && (
                     <Button
                       onClick={handleCompleteAll}
@@ -592,15 +592,15 @@ export default function AsceticismsPage() {
                       key={ua.id}
                       className={cn(
                         "group relative flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors",
-                        logged && "bg-muted/30"
+                        logged && "bg-muted/30",
                       )}
                     >
                       {/* Left: Icon + Title + Description */}
                       <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center">
+                        <div className="shrink-0 w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center">
                           {getCategoryIcon(
                             ua.asceticism?.category || "custom",
-                            "w-4 h-4 text-muted-foreground"
+                            "w-4 h-4 text-muted-foreground",
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -610,7 +610,7 @@ export default function AsceticismsPage() {
                             </h3>
                             <Badge
                               variant="outline"
-                              className="h-5 px-1.5 text-xs flex-shrink-0"
+                              className="h-5 px-1.5 text-xs shrink-0"
                             >
                               {type}
                             </Badge>
@@ -638,7 +638,7 @@ export default function AsceticismsPage() {
                       </div>
 
                       {/* Right: Action Button + Menu */}
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="flex items-center gap-2 shrink-0">
                         <Button
                           onClick={() => handleLog(ua.id, type)}
                           size="sm"
@@ -646,7 +646,7 @@ export default function AsceticismsPage() {
                           disabled={(!isToday && logged) || isViewingFuture()}
                           className={cn(
                             "h-8 px-3 gap-1.5",
-                            logged && "opacity-70"
+                            logged && "opacity-70",
                           )}
                         >
                           {type === "BOOLEAN" ? (
@@ -664,8 +664,8 @@ export default function AsceticismsPage() {
                                 ? "Done"
                                 : "Logged"
                               : type === "BOOLEAN"
-                              ? "Log"
-                              : "Add"}
+                                ? "Log"
+                                : "Add"}
                           </span>
                         </Button>
 
@@ -702,7 +702,7 @@ export default function AsceticismsPage() {
                               e.stopPropagation();
                               handleLeaveClick(
                                 ua.id,
-                                ua.asceticism?.title || "this practice"
+                                ua.asceticism?.title || "this practice",
                               );
                             }}
                             title="Remove"
@@ -822,7 +822,7 @@ export default function AsceticismsPage() {
 
       {/* Join Dialog */}
       <Dialog open={joinDialogOpen} onOpenChange={setJoinDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-125">
           <DialogHeader className="space-y-3">
             <DialogTitle className="text-xl">Set Commitment Dates</DialogTitle>
             <DialogDescription className="text-base">
@@ -838,7 +838,7 @@ export default function AsceticismsPage() {
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal h-11",
-                      !joinStartDate && "text-muted-foreground"
+                      !joinStartDate && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -865,7 +865,7 @@ export default function AsceticismsPage() {
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal h-11",
-                      !joinEndDate && "text-muted-foreground"
+                      !joinEndDate && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -910,7 +910,7 @@ export default function AsceticismsPage() {
 
       {/* Edit Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-125">
           <DialogHeader className="space-y-3">
             <DialogTitle className="text-xl">Edit Commitment Dates</DialogTitle>
             <DialogDescription className="text-base">
@@ -927,7 +927,7 @@ export default function AsceticismsPage() {
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal h-11",
-                      !editStartDate && "text-muted-foreground"
+                      !editStartDate && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -954,7 +954,7 @@ export default function AsceticismsPage() {
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal h-11",
-                      !editEndDate && "text-muted-foreground"
+                      !editEndDate && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -999,22 +999,22 @@ export default function AsceticismsPage() {
 
       {/* Log Dialog for all types */}
       <Dialog open={logDialogOpen} onOpenChange={setLogDialogOpen}>
-        <DialogContent className="sm:max-w-[550px]">
+        <DialogContent className="sm:max-w-137.5">
           <DialogHeader className="space-y-3">
             <DialogTitle className="text-xl">
               Log Progress{" "}
               {logType === "NUMERIC"
                 ? "- Enter Value"
                 : logType === "TEXT"
-                ? "- Add Entry"
-                : ""}
+                  ? "- Add Entry"
+                  : ""}
             </DialogTitle>
             <DialogDescription className="text-base">
               {logType === "NUMERIC"
                 ? "Enter the numeric value for today's progress."
                 : logType === "TEXT"
-                ? "Write your journal entry or notes for today."
-                : "Mark as complete and optionally add notes."}
+                  ? "Write your journal entry or notes for today."
+                  : "Mark as complete and optionally add notes."}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-5 py-4">
@@ -1085,7 +1085,7 @@ export default function AsceticismsPage() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-106.25">
           <DialogHeader className="space-y-3">
             <DialogTitle className="text-xl">Remove Commitment?</DialogTitle>
             <DialogDescription className="text-base">
@@ -1115,7 +1115,7 @@ export default function AsceticismsPage() {
 
       {/* Sign In Dialog */}
       <Dialog open={signInDialogOpen} onOpenChange={setSignInDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-106.25">
           <DialogHeader className="space-y-3">
             <DialogTitle className="text-xl">Sign In Required</DialogTitle>
             <DialogDescription className="text-base">
@@ -1138,7 +1138,7 @@ export default function AsceticismsPage() {
 
       {/* View Details Dialog */}
       <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-175 max-h-[80vh] overflow-y-auto">
           <DialogHeader className="space-y-3">
             <DialogTitle className="text-2xl">
               {viewingAsceticism?.asceticism?.title}
@@ -1147,16 +1147,16 @@ export default function AsceticismsPage() {
               <Badge variant="secondary" className="px-3 py-1">
                 {getCategoryIcon(
                   viewingAsceticism?.asceticism?.category || "custom",
-                  "w-3 h-3 mr-1.5 inline"
+                  "w-3 h-3 mr-1.5 inline",
                 )}
                 {toTitleCase(
-                  viewingAsceticism?.asceticism?.category || "custom"
+                  viewingAsceticism?.asceticism?.category || "custom",
                 )}
               </Badge>
               <Badge variant="outline" className="px-3 py-1">
                 {getTypeIcon(
                   viewingAsceticism?.asceticism?.type || "BOOLEAN",
-                  "w-3 h-3 mr-1.5 inline"
+                  "w-3 h-3 mr-1.5 inline",
                 )}
                 {viewingAsceticism?.asceticism?.type}
               </Badge>
@@ -1190,7 +1190,7 @@ export default function AsceticismsPage() {
                         year: "numeric",
                         month: "short",
                         day: "numeric",
-                      }
+                      },
                     )}
                 </div>
                 {viewingAsceticism?.endDate && (
@@ -1203,7 +1203,7 @@ export default function AsceticismsPage() {
                         year: "numeric",
                         month: "short",
                         day: "numeric",
-                      }
+                      },
                     )}
                   </div>
                 )}
@@ -1229,12 +1229,12 @@ export default function AsceticismsPage() {
                 <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                   Recent Activity
                 </h3>
-                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                <div className="space-y-2 max-h-75 overflow-y-auto">
                   {viewingAsceticism.logs
                     .filter((log) => log.notes || log.value !== undefined)
                     .sort(
                       (a, b) =>
-                        new Date(b.date).getTime() - new Date(a.date).getTime()
+                        new Date(b.date).getTime() - new Date(a.date).getTime(),
                     )
                     .slice(0, 10)
                     .map((log, idx) => (

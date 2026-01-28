@@ -1,12 +1,15 @@
+import type { TrackingType, AsceticismStatus } from "@/lib/prisma/enums";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+// API response types (these are different from Prisma models as they come from the backend)
 export interface Asceticism {
   id: number;
   title: string;
   description?: string;
   category: string;
   icon?: string;
-  type: "BOOLEAN" | "NUMERIC" | "TEXT";
+  type: TrackingType;
   isTemplate: boolean;
 }
 
@@ -71,7 +74,7 @@ export async function getAsceticisms(category?: string): Promise<Asceticism[]> {
 export async function getUserAsceticisms(
   userId: number,
   startDate?: string,
-  endDate?: string
+  endDate?: string,
 ): Promise<UserAsceticism[]> {
   const url = new URL(`${API_URL}/asceticisms/my`);
   url.searchParams.append("userId", userId.toString());
@@ -91,7 +94,7 @@ export async function getUserAsceticisms(
 export async function getUserProgress(
   userId: number,
   startDate: string,
-  endDate: string
+  endDate: string,
 ): Promise<AsceticismProgress[]> {
   const url = new URL(`${API_URL}/asceticisms/progress`);
   url.searchParams.append("userId", userId.toString());
@@ -104,7 +107,7 @@ export async function getUserProgress(
 }
 
 export async function createAsceticism(
-  data: Partial<Asceticism> & { creatorId?: number }
+  data: Partial<Asceticism> & { creatorId?: number },
 ): Promise<Asceticism> {
   const res = await fetch(`${API_URL}/asceticisms/`, {
     method: "POST",
@@ -125,7 +128,7 @@ export async function joinAsceticism(
   asceticismId: number,
   targetValue?: number,
   startDate?: string,
-  endDate?: string
+  endDate?: string,
 ): Promise<UserAsceticism> {
   const res = await fetch(`${API_URL}/asceticisms/join`, {
     method: "POST",
@@ -164,7 +167,7 @@ export async function logProgress(entry: LogEntry): Promise<any> {
 
 export async function updateAsceticism(
   id: number,
-  data: Partial<Asceticism> & { creatorId?: number }
+  data: Partial<Asceticism> & { creatorId?: number },
 ): Promise<Asceticism> {
   const res = await fetch(`${API_URL}/asceticisms/${id}`, {
     method: "PUT",
@@ -198,7 +201,7 @@ export async function leaveAsceticism(userAsceticismId: number): Promise<void> {
 
 export async function updateUserAsceticism(
   userAsceticismId: number,
-  data: { startDate?: string; endDate?: string; targetValue?: number }
+  data: { startDate?: string; endDate?: string; targetValue?: number },
 ): Promise<UserAsceticism> {
   const res = await fetch(`${API_URL}/asceticisms/my/${userAsceticismId}`, {
     method: "PATCH",

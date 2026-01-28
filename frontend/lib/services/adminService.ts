@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
-import { UserRole } from "@/lib/types/admin";
+import { UserRole } from "@/lib/prisma/enums";
 import { revalidatePath } from "next/cache";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -19,17 +19,6 @@ export interface UserData {
   emailVerified: string | null;
   userAsceticismsCount: number;
   groupMembersCount: number;
-}
-
-/**
- * Current user data type
- */
-export interface CurrentUserData {
-  id: number;
-  name: string | null;
-  email: string | null;
-  role: UserRole;
-  isBanned: boolean;
 }
 
 /**
