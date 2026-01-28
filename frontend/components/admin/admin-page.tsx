@@ -3,8 +3,8 @@ import UsersTable from "@/components/admin/users-table";
 import { redirect } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ShieldAlert } from "lucide-react";
-import { UserRole } from "@/lib/types/admin";
 import { auth } from "@/auth";
+import { UserRole } from "@/lib/prisma/enums";
 
 export default async function AdminPage() {
   const session = await auth();
@@ -12,21 +12,6 @@ export default async function AdminPage() {
   // Check if user is logged in
   if (!session?.user) {
     redirect("/api/auth/signin");
-  }
-
-  // Check if user is banned
-  if (session.user.isBanned) {
-    return (
-      <div className="container mx-auto py-10">
-        <Alert variant="destructive">
-          <ShieldAlert className="h-4 w-4" />
-          <AlertTitle>Access Denied</AlertTitle>
-          <AlertDescription>
-            Your account has been banned. Please contact support for assistance.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
   }
 
   // Check if user is admin
@@ -47,6 +32,8 @@ export default async function AdminPage() {
 
   // Fetch all users
   const users = await getAllUsers();
+
+  console.log(users);
 
   return (
     <div className="container mx-auto py-10 space-y-8">

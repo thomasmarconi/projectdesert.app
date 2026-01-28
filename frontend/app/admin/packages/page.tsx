@@ -2,7 +2,7 @@ import { PackagesManagementPage } from "@/components/admin/packages-management";
 import { redirect } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ShieldAlert } from "lucide-react";
-import { UserRole } from "@/lib/types/admin";
+import { UserRole } from "@/lib/prisma/enums";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { auth } from "@/auth";
 
@@ -34,7 +34,9 @@ export default async function AdminPackagesPage() {
 
   return (
     <SidebarInset>
-      <PackagesManagementPage />
+      <div className="container mx-auto p-6">
+        <PackagesManagementPage />
+      </div>
     </SidebarInset>
   );
 }

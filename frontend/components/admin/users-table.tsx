@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { UserRole } from "@/lib/types/admin";
+import { UserRole } from "@/lib/prisma/enums";
 import {
   Table,
   TableBody,
@@ -151,7 +151,7 @@ export default function UsersTable({ users, currentUserId }: UsersTableProps) {
   return (
     <>
       <Card className="border-none shadow-lg">
-        <CardHeader className="bg-linear-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
+        <CardHeader>
           <CardTitle className="text-2xl">User Management</CardTitle>
           <CardDescription>
             Manage user roles and permissions across the platform
@@ -182,7 +182,10 @@ export default function UsersTable({ users, currentUserId }: UsersTableProps) {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 border-2 border-background shadow-sm">
-                          <AvatarImage src={user.image || undefined} />
+                          <AvatarImage
+                            src={user.image || undefined}
+                            referrerPolicy="no-referrer"
+                          />
                           <AvatarFallback className="bg-linear-to-br from-purple-400 to-blue-400 text-white">
                             {getInitials(user.name)}
                           </AvatarFallback>
