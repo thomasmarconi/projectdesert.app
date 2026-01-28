@@ -120,27 +120,3 @@ export async function toggleUserBan(userId: number, isBanned: boolean) {
   revalidatePath("/admin");
   return res.json();
 }
-
-/**
- * Get current user info
- */
-export async function getCurrentUser(): Promise<CurrentUserData | null> {
-  const session = await auth();
-
-  if (!session?.user?.email) {
-    return null;
-  }
-
-  const headers = await getAuthHeaders();
-
-  const res = await fetch(`${API_URL}/admin/current-user`, {
-    headers,
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    return null;
-  }
-
-  return res.json();
-}
