@@ -15,7 +15,7 @@ frontend:
 	cd frontend && npm run dev
 
 backend:
-	source api/venv/bin/activate && uvicorn api.main:app --reload
+	cd api && source venv/bin/activate && fastapi dev main.py
 
 # Setup
 setup-frontend:
