@@ -114,6 +114,7 @@ export default function AsceticismsPage() {
   const [logType, setLogType] = useState<"BOOLEAN" | "NUMERIC" | "TEXT">(
     "BOOLEAN",
   );
+  const [isEditingLog, setIsEditingLog] = useState(false);
 
   // Delete confirmation dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -223,22 +224,35 @@ export default function AsceticismsPage() {
     userAsceticismId: number,
     type: "BOOLEAN" | "NUMERIC" | "TEXT",
   ) {
-    // Always open dialog to allow notes for all types
-    setLogUserAsceticismId(userAsceticismId);
-    setLogType(type);
-    setLogValue("");
-    setLogNotes("");
+    // Check if already logged for this date
+    const ua = myAsceticisms.find((a) => a.id === userAsceticismId);
+    const existingLog = ua ? getLogForDate(ua) : null;
+
+    if (existingLog) {
+      // User is editing an existing log
+      setIsEditingLog(true);
+      setLogUserAsceticismId(userAsceticismId);
+      setLogType(type);
+      setLogValue(existingLog.value?.toString() || "");
+      setLogNotes(existingLog.notes || "");
+    } else {
+      // User is creating a new log
+      setIsEditingLog(false);
+      setLogUserAsceticismId(userAsceticismId);
+      setLogType(type);
+      setLogValue("");
+      setLogNotes("");
+    }
     setLogDialogOpen(true);
   }
 
   async function handleLogConfirm() {
     if (!logUserAsceticismId) return;
 
-    const date = viewingDate.toISOString();
+    // Use date-only format to match backend expectations (YYYY-MM-DD)
+    const date = viewingDate.toISOString().split("T")[0];
     try {
       const logData: any = {
-        userAsceticismId: logUserAsceticismId,
-        date,
         completed: true,
       };
 
@@ -262,11 +276,22 @@ export default function AsceticismsPage() {
         logData.notes = logNotes;
       }
 
-      await logProgress(logData);
-      toast.success("Progress logged for today!");
+      // Always use upsert endpoint - it handles both create and update
+      await logProgress({
+        userAsceticismId: logUserAsceticismId,
+        date,
+        completed: true,
+        value: logData.value,
+        notes: logData.notes,
+      });
+
+      toast.success(isEditingLog ? "Progress updated!" : "Progress logged!");
+
       setLogDialogOpen(false);
+      setIsEditingLog(false);
       fetchData();
     } catch (e) {
+      console.error("Failed to log progress:", e);
       toast.error("Failed to log progress.");
     }
   }
@@ -445,9 +470,7 @@ export default function AsceticismsPage() {
   return (
     <div className="container mx-auto px-4 py-8 md:px-8 md:py-10 max-w-7xl">
       <div className="flex flex-col gap-3 mb-10">
-        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl bg-linear-to-r from-amber-700 to-orange-500 bg-clip-text text-transparent">
-          Asceticism
-        </h1>
+        <h1 className="text-4xl font-bold lg:text-5xl">Asceticism</h1>
         <p className="text-muted-foreground text-lg">
           Discipline your body and soul through daily practices.
         </p>
@@ -643,7 +666,7 @@ export default function AsceticismsPage() {
                           onClick={() => handleLog(ua.id, type)}
                           size="sm"
                           variant={logged ? "secondary" : "default"}
-                          disabled={(!isToday && logged) || isViewingFuture()}
+                          disabled={isViewingFuture()}
                           className={cn(
                             "h-8 px-3 gap-1.5",
                             logged && "opacity-70",
@@ -1002,7 +1025,7 @@ export default function AsceticismsPage() {
         <DialogContent className="sm:max-w-137.5">
           <DialogHeader className="space-y-3">
             <DialogTitle className="text-xl">
-              Log Progress{" "}
+              {isEditingLog ? "Edit" : "Log"} Progress{" "}
               {logType === "NUMERIC"
                 ? "- Enter Value"
                 : logType === "TEXT"
@@ -1010,11 +1033,13 @@ export default function AsceticismsPage() {
                   : ""}
             </DialogTitle>
             <DialogDescription className="text-base">
-              {logType === "NUMERIC"
-                ? "Enter the numeric value for today's progress."
-                : logType === "TEXT"
-                  ? "Write your journal entry or notes for today."
-                  : "Mark as complete and optionally add notes."}
+              {isEditingLog
+                ? "Update the notes or value for today's entry."
+                : logType === "NUMERIC"
+                  ? "Enter the numeric value for today's progress."
+                  : logType === "TEXT"
+                    ? "Write your journal entry or notes for today."
+                    : "Mark as complete and optionally add notes."}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-5 py-4">
@@ -1068,16 +1093,19 @@ export default function AsceticismsPage() {
               />
             </div>
           </div>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2">
             <Button
               variant="outline"
-              onClick={() => setLogDialogOpen(false)}
+              onClick={() => {
+                setLogDialogOpen(false);
+                setIsEditingLog(false);
+              }}
               className="h-10 px-6"
             >
               Cancel
             </Button>
             <Button onClick={handleLogConfirm} className="h-10 px-6">
-              Log Progress
+              {isEditingLog ? "Update Progress" : "Log Progress"}
             </Button>
           </DialogFooter>
         </DialogContent>

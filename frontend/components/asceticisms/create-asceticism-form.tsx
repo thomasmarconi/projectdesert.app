@@ -160,7 +160,7 @@ export default function CreateAsceticismForm({
           : formData.category;
 
       const selectedCategoryData = CATEGORIES.find(
-        (c) => c.value === formData.category
+        (c) => c.value === formData.category,
       );
       const iconName = selectedCategoryData?.icon.name || "Sparkles";
 
@@ -180,7 +180,7 @@ export default function CreateAsceticismForm({
         newAsceticism.id,
         undefined,
         formData.startDate || undefined,
-        formData.endDate || undefined
+        formData.endDate || undefined,
       );
 
       toast.success("Practice created successfully!", {
@@ -211,7 +211,7 @@ export default function CreateAsceticismForm({
   };
 
   const selectedCategory = CATEGORIES.find(
-    (c) => c.value === formData.category
+    (c) => c.value === formData.category,
   );
   const CategoryIcon = selectedCategory?.icon || Sparkles;
 
@@ -235,7 +235,7 @@ export default function CreateAsceticismForm({
       )}
       <CardHeader className={cn("space-y-2", disabled && "pt-8")}>
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg shadow-sm">
+          <div className="p-2 bg-linear-to-br from-amber-500 to-orange-500 rounded-lg shadow-sm">
             <Sparkles className="h-5 w-5 text-white" />
           </div>
           <div>
@@ -283,7 +283,7 @@ export default function CreateAsceticismForm({
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              className="min-h-[100px] text-base resize-none"
+              className="min-h-25 text-base resize-none"
               disabled={disabled}
             />
             <p className="text-sm text-muted-foreground">
@@ -450,7 +450,7 @@ export default function CreateAsceticismForm({
                     <Badge variant="outline">
                       {
                         TRACKING_TYPES.find(
-                          (t) => t.value === formData.type
+                          (t) => t.value === formData.type,
                         )?.label.split(" ")[0]
                       }
                     </Badge>
@@ -502,7 +502,7 @@ export default function CreateAsceticismForm({
           </Button>
           <Button
             type="submit"
-            className="flex-1 gap-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
+            className="flex-1 gap-2 bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
             disabled={isSubmitting || disabled}
           >
             {isSubmitting ? (

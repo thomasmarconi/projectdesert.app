@@ -39,6 +39,13 @@ class LogCreate(BaseModel):
     metadata: Optional[dict] = None
 
 
+class LogUpdate(BaseModel):
+    value: Optional[float] = None
+    notes: Optional[str] = None
+    completed: Optional[bool] = None
+    metadata: Optional[dict] = None
+
+
 class UserAsceticismUpdate(BaseModel):
     startDate: Optional[str] = None
     endDate: Optional[str] = None
@@ -54,11 +61,11 @@ async def list_asceticisms(category: Optional[str] = None):
     """
     List all available asceticism templates (isTemplate=True).
     """
-    where = {"isTemplate": True}
+    where: dict = {"isTemplate": True}
     if category:
         where["category"] = category
 
-    return await db.asceticism.find_many(where=where)
+    return await db.asceticism.find_many(where=where)  # type: ignore
 
 
 @router.post("/asceticisms/", tags=["asceticisms"], response_model=Asceticism)
@@ -70,7 +77,7 @@ async def create_asceticism(item: AsceticismCreate):
     is_template = item.creatorId is None
 
     # helper to filter out None values to let Prisma handle nulls/defaults gracefully
-    data = {
+    data: dict = {
         "title": item.title,
         "category": item.category,
         "type": item.type,
@@ -86,7 +93,7 @@ async def create_asceticism(item: AsceticismCreate):
     if item.creatorId is not None:
         data["creatorId"] = item.creatorId
 
-    return await db.asceticism.create(data=data)
+    return await db.asceticism.create(data=data)  # type: ignore
 
 
 @router.put(
@@ -103,7 +110,7 @@ async def update_asceticism(asceticism_id: int, item: AsceticismCreate):
         raise HTTPException(status_code=404, detail="Asceticism not found")
 
     # Prepare update data
-    data = {
+    data: dict = {
         "title": item.title,
         "category": item.category,
         "type": item.type,
@@ -116,7 +123,7 @@ async def update_asceticism(asceticism_id: int, item: AsceticismCreate):
     if item.metadata is not None:
         data["metadata"] = item.metadata
 
-    return await db.asceticism.update(where={"id": asceticism_id}, data=data)
+    return await db.asceticism.update(where={"id": asceticism_id}, data=data)  # type: ignore
 
 
 @router.delete("/asceticisms/{asceticism_id}", tags=["asceticisms"])
@@ -154,8 +161,6 @@ async def list_user_asceticisms(
     """
     Get all active asceticisms for a specific user, including logs within the date range.
     """
-    from datetime import datetime, timezone
-
     # Build logs filter
     logs_where = {}
     if start_date and end_date:
@@ -166,6 +171,8 @@ async def list_user_asceticisms(
         logs_where["date"] = {"lte": end_date}
     else:
         # Default: Get today's logs only
+        from datetime import timezone
+
         today_start = datetime.now(timezone.utc).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
@@ -173,7 +180,7 @@ async def list_user_asceticisms(
 
     return await db.userasceticism.find_many(
         where={"userId": user_id, "status": AsceticismStatus.ACTIVE},
-        include={
+        include={  # type: ignore
             "asceticism": True,
             "logs": {
                 "where": logs_where,
@@ -200,7 +207,7 @@ async def join_asceticism(link: UserAsceticismLink):
         return existing
 
     # filter Nones & use Connect for relations
-    data = {
+    data: dict = {
         "user": {"connect": {"id": link.userId}},
         "asceticism": {"connect": {"id": link.asceticismId}},
     }
@@ -219,7 +226,7 @@ async def join_asceticism(link: UserAsceticismLink):
     if link.metadata is not None:
         data["metadata"] = link.metadata
 
-    return await db.userasceticism.create(data=data)
+    return await db.userasceticism.create(data=data)  # type: ignore
 
 
 @router.post("/asceticisms/log", tags=["asceticisms"], response_model=AsceticismLog)
@@ -227,11 +234,22 @@ async def log_daily_progress(log: LogCreate):
     """
     Log progress for a specific day. Upserts (updates if exists).
     """
-    # Parse date appropriately if needed, but Prisma Python might handle ISO strings for DateTime
-    # Note: Ensure the string is formatted as ISO-8601
+    # Parse date string to datetime object (accepts YYYY-MM-DD or ISO datetime)
+    try:
+        # If it's just a date (YYYY-MM-DD), convert to start of day
+        if "T" not in log.date:
+            parsed_date = datetime.strptime(log.date, "%Y-%m-%d")
+        else:
+            # Already an ISO datetime string, parse it
+            parsed_date = datetime.fromisoformat(log.date.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid date format. Use YYYY-MM-DD or ISO datetime.",
+        ) from exc
 
     # Prepare update data (no relations needed here usually, just scalars)
-    update_data = {"completed": log.completed}
+    update_data: dict = {"completed": log.completed}
     if log.value is not None:
         update_data["value"] = log.value
     if log.notes is not None:
@@ -240,9 +258,9 @@ async def log_daily_progress(log: LogCreate):
         update_data["metadata"] = log.metadata
 
     # Prepare create data (requires relation connection)
-    create_data = {
+    create_data: dict = {
         "userAsceticism": {"connect": {"id": log.userAsceticismId}},
-        "date": log.date,
+        "date": parsed_date,
         "completed": log.completed,
     }
     if log.value is not None:
@@ -253,13 +271,13 @@ async def log_daily_progress(log: LogCreate):
         create_data["metadata"] = log.metadata
 
     return await db.asceticismlog.upsert(
-        where={
+        where={  # type: ignore
             "userAsceticismId_date": {
                 "userAsceticismId": log.userAsceticismId,
-                "date": log.date,  # Expecting ISO string
+                "date": parsed_date,
             }
         },
-        data={"create": create_data, "update": update_data},
+        data={"create": create_data, "update": update_data},  # type: ignore
     )
 
 
@@ -302,18 +320,22 @@ async def update_user_asceticism(user_asceticism_id: int, update: UserAsceticism
         raise HTTPException(status_code=404, detail="User asceticism not found")
 
     # Prepare update data
-    data = {}
+    data: dict = {}
     if update.startDate is not None:
         try:
             data["startDate"] = datetime.fromisoformat(update.startDate)
-        except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid startDate format")
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=400, detail="Invalid startDate format"
+            ) from exc
 
     if update.endDate is not None:
         try:
             data["endDate"] = datetime.fromisoformat(update.endDate)
-        except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid endDate format")
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=400, detail="Invalid endDate format"
+            ) from exc
 
     if update.targetValue is not None:
         data["targetValue"] = update.targetValue
@@ -323,7 +345,7 @@ async def update_user_asceticism(user_asceticism_id: int, update: UserAsceticism
 
     # Update the user asceticism
     return await db.userasceticism.update(
-        where={"id": user_asceticism_id}, data=data, include={"asceticism": True}
+        where={"id": user_asceticism_id}, data=data, include={"asceticism": True}  # type: ignore
     )
 
 
@@ -337,12 +359,10 @@ async def get_user_progress(
     Get progress statistics for all user asceticisms within a date range.
     Returns completion rates, streaks, and detailed logs.
     """
-    from datetime import datetime, timedelta
-
     # Get all active user asceticisms
     user_asceticisms = await db.userasceticism.find_many(
         where={"userId": user_id, "status": AsceticismStatus.ACTIVE},
-        include={
+        include={  # type: ignore
             "asceticism": True,
             "logs": {
                 "where": {"date": {"gte": start_date, "lte": end_date}},
@@ -354,6 +374,10 @@ async def get_user_progress(
     # Calculate statistics for each asceticism
     progress_data = []
     for ua in user_asceticisms:
+        # Ensure asceticism data is loaded
+        if not ua.asceticism:
+            continue
+
         logs = ua.logs or []
 
         # Calculate total days in range

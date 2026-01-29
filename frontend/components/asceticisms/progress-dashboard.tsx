@@ -6,6 +6,7 @@ import {
   AsceticismProgress,
   ProgressLog,
 } from "@/lib/services/asceticismService";
+import { Input } from "@/components/ui/input";
 import {
   format,
   eachDayOfInterval,
@@ -88,6 +89,7 @@ export default function ProgressDashboard() {
   const [progressData, setProgressData] = useState<AsceticismProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("7d");
+  const [searchQuery, setSearchQuery] = useState("");
   const [hoveredDay, setHoveredDay] = useState<{
     date: string;
     log: ProgressLog | null;
@@ -136,26 +138,36 @@ export default function ProgressDashboard() {
     };
   }
 
+  // Filter progress data by search query
+  const filteredProgressData = useMemo(() => {
+    if (!searchQuery.trim()) return progressData;
+
+    const query = searchQuery.toLowerCase();
+    return progressData.filter((p) =>
+      p.asceticism.title.toLowerCase().includes(query),
+    );
+  }, [progressData, searchQuery]);
+
   // Calculate overall statistics across all asceticisms
   const overallStats = useMemo(() => {
-    if (!progressData.length) return null;
+    if (!filteredProgressData.length) return null;
 
-    const totalCompletedDays = progressData.reduce(
+    const totalCompletedDays = filteredProgressData.reduce(
       (sum, p) => sum + p.stats.completedDays,
-      0
+      0,
     );
-    const totalPossibleDays = progressData.reduce(
+    const totalPossibleDays = filteredProgressData.reduce(
       (sum, p) => sum + p.stats.totalDays,
-      0
+      0,
     );
     const avgCompletionRate =
-      progressData.reduce((sum, p) => sum + p.stats.completionRate, 0) /
-      progressData.length;
+      filteredProgressData.reduce((sum, p) => sum + p.stats.completionRate, 0) /
+      filteredProgressData.length;
     const maxStreak = Math.max(
-      ...progressData.map((p) => p.stats.longestStreak)
+      ...filteredProgressData.map((p) => p.stats.longestStreak),
     );
-    const activePractices = progressData.filter(
-      (p) => p.stats.currentStreak > 0
+    const activePractices = filteredProgressData.filter(
+      (p) => p.stats.currentStreak > 0,
     ).length;
 
     return {
@@ -164,14 +176,14 @@ export default function ProgressDashboard() {
       avgCompletionRate: Math.round(avgCompletionRate),
       maxStreak,
       activePractices,
-      totalPractices: progressData.length,
+      totalPractices: filteredProgressData.length,
     };
-  }, [progressData]);
+  }, [filteredProgressData]);
 
   // Render enhanced heatmap with weekly layout and hover tooltips
   function renderHeatmap(
     logs: AsceticismProgress["logs"],
-    asceticismTitle: string
+    asceticismTitle: string,
   ) {
     const { startDate, endDate } = getDateRange(timePeriod);
     const start = startOfDay(new Date(startDate));
@@ -191,7 +203,7 @@ export default function ProgressDashboard() {
     const weekStart = startOfWeek(start, { weekStartsOn: 0 }); // Sunday
     const daysToShow = differenceInDays(end, weekStart) + 1;
     const allDays = Array.from({ length: daysToShow }, (_, i) =>
-      addDays(weekStart, i)
+      addDays(weekStart, i),
     );
 
     // Create a map of date strings to log entries
@@ -199,7 +211,7 @@ export default function ProgressDashboard() {
       (logs || []).map((log) => {
         const dateKey = format(new Date(log.date), "yyyy-MM-dd");
         return [dateKey, log];
-      })
+      }),
     );
 
     // Group days into weeks
@@ -275,7 +287,7 @@ export default function ProgressDashboard() {
                         <div
                           className={`w-3.5 h-3.5 rounded-sm cursor-pointer transition-all duration-200 border ${getIntensity(
                             completed,
-                            hasNotes
+                            hasNotes,
                           )} ${
                             isToday(day)
                               ? "ring-2 ring-blue-500 ring-offset-1"
@@ -451,8 +463,8 @@ export default function ProgressDashboard() {
           <Skeleton className="h-32 w-full" />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Skeleton className="h-[600px] w-full" />
-          <Skeleton className="h-[600px] w-full" />
+          <Skeleton className="h-150 w-full" />
+          <Skeleton className="h-150 w-full" />
         </div>
       </div>
     );
@@ -484,28 +496,37 @@ export default function ProgressDashboard() {
             Track your consistency, growth, and achievements
           </p>
         </div>
-        <Select
-          value={timePeriod}
-          onValueChange={(v) => setTimePeriod(v as TimePeriod)}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {TIME_PERIODS.map((period) => (
-              <SelectItem key={period.value} value={period.value}>
-                {period.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex gap-2">
+          <Input
+            type="text"
+            placeholder="Search by name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-64"
+          />
+          <Select
+            value={timePeriod}
+            onValueChange={(v) => setTimePeriod(v as TimePeriod)}
+          >
+            <SelectTrigger className="w-45">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {TIME_PERIODS.map((period) => (
+                <SelectItem key={period.value} value={period.value}>
+                  {period.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Overall Statistics Cards */}
       {overallStats && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <Card className="border-l-4 border-l-green-500">
-            <CardHeader className="pb-3">
+          <Card className="border-l-4 border-l-green-500 border-t-4 border-t-green-500">
+            <CardHeader>
               <CardDescription className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4" />
                 Completion Rate
@@ -522,8 +543,8 @@ export default function ProgressDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-orange-500">
-            <CardHeader className="pb-3">
+          <Card className="border-l-4 border-l-orange-500 border-t-4 border-t-orange-500">
+            <CardHeader>
               <CardDescription className="flex items-center gap-2">
                 <Flame className="h-4 w-4" />
                 Best Streak
@@ -539,8 +560,8 @@ export default function ProgressDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-blue-500">
-            <CardHeader className="pb-3">
+          <Card className="border-l-4 border-l-blue-500 border-t-4 border-t-blue-500">
+            <CardHeader>
               <CardDescription className="flex items-center gap-2">
                 <Target className="h-4 w-4" />
                 Total Days
@@ -554,8 +575,8 @@ export default function ProgressDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-purple-500">
-            <CardHeader className="pb-3">
+          <Card className="border-l-4 border-l-purple-500 border-t-4 border-t-purple-500">
+            <CardHeader>
               <CardDescription className="flex items-center gap-2">
                 <Activity className="h-4 w-4" />
                 Active Practices
@@ -571,8 +592,8 @@ export default function ProgressDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-amber-500">
-            <CardHeader className="pb-3">
+          <Card className="border-l-4 border-l-amber-500 border-t-4 border-t-amber-500">
+            <CardHeader>
               <CardDescription className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
                 Period
@@ -592,7 +613,17 @@ export default function ProgressDashboard() {
 
       {/* Individual Practice Progress Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {progressData.map((progress) => {
+        {filteredProgressData.length === 0 && searchQuery ? (
+          <div className="col-span-2 flex flex-col items-center justify-center p-12 border-2 border-dashed rounded-lg text-muted-foreground">
+            <BarChart3 size={48} className="mb-4 opacity-50" />
+            <p className="text-lg font-semibold">No matches found</p>
+            <p className="text-sm text-center max-w-md mt-2">
+              No asceticisms match &ldquo;{searchQuery}&rdquo;. Try a different
+              search term.
+            </p>
+          </div>
+        ) : null}
+        {filteredProgressData.map((progress) => {
           const momentum = calculateMomentum(progress);
           const achievement = getAchievementLevel(progress.stats);
           const AchievementIcon = achievement.icon;
@@ -610,7 +641,14 @@ export default function ProgressDashboard() {
                       variant="outline"
                       className="bg-primary/10 text-primary border-primary/20 font-semibold"
                     >
-                      {progress.asceticism.category}
+                      {progress.asceticism.category
+                        .split("-")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase(),
+                        )
+                        .join(" ")}
                     </Badge>
                     <Badge
                       variant="outline"
@@ -660,7 +698,7 @@ export default function ProgressDashboard() {
               <CardContent className="space-y-6">
                 {/* Key Metrics Grid */}
                 <div className="grid grid-cols-2 gap-3">
-                  <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 border-green-200 dark:border-green-800">
+                  <Card className="bg-linear-to-br from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 border-green-200 dark:border-green-800">
                     <CardContent className="pt-4 pb-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2.5 rounded-lg bg-green-100 dark:bg-green-900/50">
@@ -678,7 +716,7 @@ export default function ProgressDashboard() {
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/50 dark:to-amber-950/50 border-orange-200 dark:border-orange-800">
+                  <Card className="bg-linear-to-br from-orange-50 to-amber-50 dark:from-orange-950/50 dark:to-amber-950/50 border-orange-200 dark:border-orange-800">
                     <CardContent className="pt-4 pb-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2.5 rounded-lg bg-orange-100 dark:bg-orange-900/50">
@@ -696,7 +734,7 @@ export default function ProgressDashboard() {
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border-blue-200 dark:border-blue-800">
+                  <Card className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border-blue-200 dark:border-blue-800">
                     <CardContent className="pt-4 pb-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2.5 rounded-lg bg-blue-100 dark:bg-blue-900/50">
@@ -714,7 +752,7 @@ export default function ProgressDashboard() {
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/50 dark:to-pink-950/50 border-purple-200 dark:border-purple-800">
+                  <Card className="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-950/50 dark:to-pink-950/50 border-purple-200 dark:border-purple-800">
                     <CardContent className="pt-4 pb-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2.5 rounded-lg bg-purple-100 dark:bg-purple-900/50">
