@@ -22,25 +22,59 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 export const client = createClient<paths>({ baseUrl: API_URL });
 
 /**
- * Create an authenticated API client with user email header.
+ * Get the session token for API authentication.
+ * This retrieves the JWT token from NextAuth cookies.
+ *
+ * @returns The session token or null if not authenticated
+ */
+async function getSessionToken(): Promise<string | null> {
+  if (typeof window === "undefined") {
+    // Server-side: Use next-auth to get token
+    const { auth } = await import("@/auth");
+    const session = await auth();
+
+    if (!session) return null;
+
+    // Get the token from the session
+    // NextAuth stores tokens in the session object
+    return (session as any).token?.sub || null;
+  } else {
+    // Client-side: Get token from cookie
+    const cookies = document.cookie.split(";");
+    const sessionCookie = cookies.find(
+      (c) =>
+        c.trim().startsWith("next-auth.session-token=") ||
+        c.trim().startsWith("__Secure-next-auth.session-token="),
+    );
+
+    if (!sessionCookie) return null;
+
+    const token = sessionCookie.split("=")[1];
+    return token || null;
+  }
+}
+
+/**
+ * Create an authenticated API client with JWT Bearer token.
  * Use this for endpoints that require authentication.
  *
- * @param userEmail - The user's email for authentication
  * @returns A configured API client with authentication headers
  *
  * Example usage:
  * ```typescript
- * const authClient = createAuthClient(session.user.email);
+ * const authClient = await createAuthClient();
  * const { data, error } = await authClient.GET("/admin/users");
  * ```
  */
-export function createAuthClient(userEmail: string | null | undefined) {
+export async function createAuthClient() {
+  const token = await getSessionToken();
+
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
 
-  if (userEmail) {
-    headers["x-user-email"] = userEmail;
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   return createClient<paths>({

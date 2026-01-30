@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     """Application settings."""
 
     DATABASE_URL: str
+    NEXTAUTH_SECRET: str
 
     class Config:
         env_file = ".env"

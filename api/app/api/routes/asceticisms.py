@@ -5,12 +5,15 @@ from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlmodel import Session, select, and_, or_, func
 from app.core.database import get_session
+from app.core.auth import get_current_user, require_admin
 from app.models import (
     Asceticism,
     UserAsceticism,
     AsceticismLog,
     TrackingType,
     AsceticismStatus,
+    User,
+    UserRole,
 )
 from app.schemas.asceticisms import (
     AsceticismCreate,
@@ -53,10 +56,23 @@ async def list_asceticisms(
 @router.post("/asceticisms/", tags=["asceticisms"], response_model=AsceticismResponse)
 async def create_asceticism(
     item: AsceticismCreate,
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
-    """Create a new asceticism."""
+    """Create a new asceticism. Requires admin for templates, auth for custom."""
     is_template = item.creatorId is None
+
+    # Only admins can create templates
+    if is_template and current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=403, detail="Only admins can create asceticism templates"
+        )
+
+    # If creating custom, ensure creatorId matches current user
+    if not is_template and item.creatorId != current_user.id:
+        raise HTTPException(
+            status_code=403, detail="Cannot create asceticism for another user"
+        )
 
     asceticism = Asceticism(
         title=item.title,
@@ -84,9 +100,10 @@ async def create_asceticism(
 async def update_asceticism(
     asceticism_id: int,
     item: AsceticismCreate,
+    current_user: User = Depends(require_admin),
     session: Session = Depends(get_session),
 ):
-    """Update an existing asceticism template."""
+    """Update an existing asceticism template. Admin only."""
     asceticism = session.get(Asceticism, asceticism_id)
     if not asceticism:
         raise HTTPException(status_code=404, detail="Asceticism not found")
@@ -113,9 +130,10 @@ async def update_asceticism(
 @router.delete("/asceticisms/{asceticism_id}", tags=["asceticisms"])
 async def delete_asceticism(
     asceticism_id: int,
+    current_user: User = Depends(require_admin),
     session: Session = Depends(get_session),
 ):
-    """Delete an asceticism template."""
+    """Delete an asceticism template. Admin only."""
     asceticism = session.get(Asceticism, asceticism_id)
     if not asceticism:
         raise HTTPException(status_code=404, detail="Asceticism not found")
@@ -142,9 +160,15 @@ async def list_user_asceticisms(
     start_date: Optional[str] = Query(None, alias="startDate"),
     end_date: Optional[str] = Query(None, alias="endDate"),
     include_archived: bool = Query(True, alias="includeArchived"),
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """Get all asceticisms for a specific user that overlap with the date range."""
+    # Users can only view their own asceticisms unless they're admin
+    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=403, detail="Cannot view another user's asceticisms"
+        )
     # Build base query
     statement = select(UserAsceticism).where(UserAsceticism.userId == user_id)
 
@@ -258,9 +282,15 @@ async def list_user_asceticisms(
 @router.post("/asceticisms/join", tags=["asceticisms"])
 async def join_asceticism(
     link: UserAsceticismLink,
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """Subscribe a user to an asceticism."""
+    # Users can only join asceticisms for themselves
+    if current_user.id != link.userId:
+        raise HTTPException(
+            status_code=403, detail="Cannot join asceticism for another user"
+        )
     # Check if already active
     existing_active_stmt = select(UserAsceticism).where(
         and_(
@@ -339,9 +369,19 @@ async def join_asceticism(
 @router.post("/asceticisms/log", tags=["asceticisms"], response_model=LogResponse)
 async def log_daily_progress(
     log: LogCreate,
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """Log progress for a specific day."""
+    # Verify the UserAsceticism belongs to the current user
+    user_asceticism = session.get(UserAsceticism, log.userAsceticismId)
+    if not user_asceticism:
+        raise HTTPException(status_code=404, detail="User asceticism not found")
+
+    if user_asceticism.userId != current_user.id:
+        raise HTTPException(
+            status_code=403, detail="Cannot log progress for another user's asceticism"
+        )
     try:
         if "T" not in log.date:
             parsed_date = datetime.strptime(log.date, "%Y-%m-%d").replace(
@@ -399,12 +439,19 @@ async def log_daily_progress(
 @router.delete("/asceticisms/leave/{user_asceticism_id}", tags=["asceticisms"])
 async def leave_asceticism(
     user_asceticism_id: int,
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """Leave/remove an asceticism commitment."""
     user_asceticism = session.get(UserAsceticism, user_asceticism_id)
     if not user_asceticism:
         raise HTTPException(status_code=404, detail="User asceticism not found")
+
+    # Users can only leave their own asceticisms
+    if user_asceticism.userId != current_user.id:
+        raise HTTPException(
+            status_code=403, detail="Cannot leave another user's asceticism"
+        )
 
     # Check if there's a log for today
     today_start = datetime.now(timezone.utc).replace(
@@ -444,12 +491,19 @@ async def leave_asceticism(
 async def update_user_asceticism(
     user_asceticism_id: int,
     update: UserAsceticismUpdate,
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """Update a user's asceticism commitment."""
     user_asceticism = session.get(UserAsceticism, user_asceticism_id)
     if not user_asceticism:
         raise HTTPException(status_code=404, detail="User asceticism not found")
+
+    # Users can only update their own asceticisms
+    if user_asceticism.userId != current_user.id:
+        raise HTTPException(
+            status_code=403, detail="Cannot update another user's asceticism"
+        )
 
     if update.startDate is not None:
         try:
@@ -492,9 +546,15 @@ async def get_user_progress(
     user_id: int = Query(..., alias="userId"),
     start_date: str = Query(..., alias="startDate"),
     end_date: str = Query(..., alias="endDate"),
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """Get progress statistics for all user asceticisms within a date range."""
+    # Users can only view their own progress unless they're admin
+    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=403, detail="Cannot view another user's progress"
+        )
     start = parse_date(start_date)
     end = parse_date(end_date).replace(hour=23, minute=59, second=59)
 
@@ -584,16 +644,4 @@ async def get_user_progress(
     return progress_data
 
 
-@router.post("/debug/user")
-async def create_debug_user(
-    email: str,
-    session: Session = Depends(get_session),
-):
-    """Create a debug user for testing purposes."""
-    from app.models import User
-
-    user = User(email=email, name="Debug User")
-    session.add(user)
-    session.commit()
-    session.refresh(user)
-    return user
+# Debug endpoint removed for security - use proper authentication flow
