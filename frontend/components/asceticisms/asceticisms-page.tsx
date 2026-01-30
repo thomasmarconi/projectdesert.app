@@ -1,11 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import {
-  useAsceticismTemplates,
-  useUserAsceticisms,
-  useLogProgress,
-} from "@/hooks/use-asceticisms";
+import { useUserAsceticisms, useLogProgress } from "@/hooks/use-asceticisms";
 import { useAsceticismStore } from "@/lib/stores/asceticismStore";
 import { UserAsceticism } from "@/lib/services/asceticismService";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,21 +28,11 @@ export default function AsceticismsPage() {
     useAsceticismStore();
 
   // TanStack Query hooks
-  const { data: templates = [], isLoading: templatesLoading } =
-    useAsceticismTemplates();
-
   const dateStr = viewingDate.toISOString().split("T")[0];
   const { data: myAsceticisms = [], isLoading: myAsceticismsLoading } =
     useUserAsceticisms(userId, dateStr, dateStr, showArchived);
 
-  const { data: allUserAsceticisms = [] } = useUserAsceticisms(
-    userId,
-    undefined,
-    undefined,
-    true,
-  );
-
-  const loading = templatesLoading || (userId && myAsceticismsLoading);
+  const loading = userId && myAsceticismsLoading;
 
   // === Log Handlers ===
   function handleLogClick(ua: UserAsceticism) {
@@ -143,10 +129,7 @@ export default function AsceticismsPage() {
 
         {/* Browse Tab */}
         <TabsContent value="browse" className="mt-8">
-          <BrowseAsceticismTemplates
-            templates={templates}
-            userAsceticisms={allUserAsceticisms}
-          />
+          <BrowseAsceticismTemplates />
         </TabsContent>
 
         {/* Create Tab */}

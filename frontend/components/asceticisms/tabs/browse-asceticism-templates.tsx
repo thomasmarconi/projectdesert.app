@@ -1,7 +1,7 @@
 "use client";
 
 import { useAsceticismStore } from "@/lib/stores/asceticismStore";
-import { Asceticism, UserAsceticism } from "@/lib/services/asceticismService";
+import { UserAsceticism } from "@/lib/services/asceticismService";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,16 +21,27 @@ import {
   FileText,
   X,
 } from "lucide-react";
+import {
+  useAsceticismTemplates,
+  useUserAsceticisms,
+} from "@/hooks/use-asceticisms";
+import { useSession } from "next-auth/react";
 
-interface BrowseAsceticismTemplatesProps {
-  templates: Asceticism[];
-  userAsceticisms: UserAsceticism[];
-}
+export default function BrowseAsceticismTemplates() {
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
 
-export default function BrowseAsceticismTemplates({
-  templates,
-  userAsceticisms,
-}: BrowseAsceticismTemplatesProps) {
+  // TanStack Query hooks
+  const { data: templates = [], isLoading: templatesLoading } =
+    useAsceticismTemplates();
+
+  const { data: userAsceticisms = [] } = useUserAsceticisms(
+    userId,
+    undefined,
+    undefined,
+    true,
+  );
+
   const { openJoinDialog, openRemoveDialog } = useAsceticismStore();
   // Create a map of asceticism ID to user asceticism for quick lookup
   const joinedMap = new Map<number, UserAsceticism>();
