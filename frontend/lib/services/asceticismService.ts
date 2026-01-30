@@ -71,10 +71,29 @@ export async function getAsceticisms(category?: string): Promise<Asceticism[]> {
   return res.json();
 }
 
+export async function getActiveAsceticismIds(
+  userId: number,
+): Promise<Set<number>> {
+  const userAsceticisms = await getUserAsceticisms(
+    userId,
+    undefined,
+    undefined,
+    false,
+  ); // Only get active asceticisms
+  const ids = new Set<number>();
+  userAsceticisms.forEach((ua) => {
+    if (ua.asceticismId) {
+      ids.add(ua.asceticismId);
+    }
+  });
+  return ids;
+}
+
 export async function getUserAsceticisms(
   userId: number,
   startDate?: string,
   endDate?: string,
+  includeArchived: boolean = true,
 ): Promise<UserAsceticism[]> {
   const url = new URL(`${API_URL}/asceticisms/my`);
   url.searchParams.append("userId", userId.toString());
@@ -85,6 +104,7 @@ export async function getUserAsceticisms(
   if (endDate) {
     url.searchParams.append("endDate", endDate);
   }
+  url.searchParams.append("includeArchived", includeArchived.toString());
 
   const res = await fetch(url.toString());
   if (!res.ok) throw new Error("Failed to fetch user asceticisms");

@@ -7,6 +7,7 @@ import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
 import Banned from "@/components/auth/banned";
 import { auth } from "@/auth";
+import { QueryProvider } from "@/lib/providers/query-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,12 +40,14 @@ export default async function RootLayout({
           <Banned />
         ) : (
           <SessionProvider>
-            <SidebarProvider>
-              <AppSidebar />
-              <SidebarTrigger />
-              {children}
-              <Toaster />
-            </SidebarProvider>
+            <QueryProvider>
+              <SidebarProvider>
+                <AppSidebar />
+                <SidebarTrigger />
+                {children}
+                <Toaster />
+              </SidebarProvider>
+            </QueryProvider>
           </SessionProvider>
         )}
       </body>

@@ -157,33 +157,68 @@ async def list_user_asceticisms(
     user_id: int = Query(..., alias="userId"),
     start_date: Optional[str] = Query(None, alias="startDate"),
     end_date: Optional[str] = Query(None, alias="endDate"),
+    include_archived: bool = Query(True, alias="includeArchived"),
 ):
     """
-    Get all active asceticisms for a specific user, including logs within the date range.
+    Get all asceticisms for a specific user that overlap with the date range.
+    Includes archived asceticisms by default to show historical data.
     """
-    # Build logs filter
+    from datetime import timezone
+
+    # Parse dates to datetime objects
+    def parse_date(date_str: str) -> datetime:
+        """Parse YYYY-MM-DD or ISO datetime string to datetime"""
+        if "T" not in date_str:
+            # Just a date, parse as start of day
+            return datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        else:
+            # ISO datetime
+            return datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+
+    # Build where clause - include both ACTIVE and ARCHIVED by default
+    where_clause: dict = {
+        "userId": user_id,
+    }
+
+    # Filter by status if needed
+    if include_archived:
+        where_clause["status"] = {
+            "in": [AsceticismStatus.ACTIVE, AsceticismStatus.ARCHIVED]
+        }
+    else:
+        where_clause["status"] = AsceticismStatus.ACTIVE
+
+    # If dates provided, filter by date range overlap
+    if start_date or end_date:
+        query_start = parse_date(start_date) if start_date else None
+        query_end = parse_date(end_date) if end_date else None
+
+        # Show asceticism if it was active during the date range
+        # Active means: started before/at the range end AND (no end date OR ended after/at the range start)
+        if query_end:
+            where_clause["startDate"] = {"lte": query_end}
+        if query_start:
+            where_clause["OR"] = [{"endDate": None}, {"endDate": {"gte": query_start}}]
+
+    # Build logs filter for the specific date range
     logs_where = {}
     if start_date and end_date:
-        logs_where["date"] = {"gte": start_date, "lte": end_date}
+        logs_start = parse_date(start_date)
+        logs_end = parse_date(end_date).replace(hour=23, minute=59, second=59)
+        logs_where["date"] = {"gte": logs_start, "lte": logs_end}
     elif start_date:
-        logs_where["date"] = {"gte": start_date}
+        logs_start = parse_date(start_date)
+        logs_where["date"] = {"gte": logs_start}
     elif end_date:
-        logs_where["date"] = {"lte": end_date}
-    else:
-        # Default: Get today's logs only
-        from datetime import timezone
-
-        today_start = datetime.now(timezone.utc).replace(
-            hour=0, minute=0, second=0, microsecond=0
-        )
-        logs_where["date"] = {"gte": today_start.isoformat()}
+        logs_end = parse_date(end_date).replace(hour=23, minute=59, second=59)
+        logs_where["date"] = {"lte": logs_end}
 
     return await db.userasceticism.find_many(
-        where={"userId": user_id, "status": AsceticismStatus.ACTIVE},
+        where=where_clause,  # type: ignore
         include={  # type: ignore
             "asceticism": True,
             "logs": {
-                "where": logs_where,
+                "where": logs_where if logs_where else {},
                 "order_by": {"date": "desc"},
             },
         },
@@ -194,39 +229,95 @@ async def list_user_asceticisms(
 async def join_asceticism(link: UserAsceticismLink):
     """
     Subscribe a user to an asceticism.
+    If previously archived, reactivates it. Otherwise creates new commitment.
     """
-    # Check if already joined?
-    existing = await db.userasceticism.find_first(
+    from datetime import timezone
+
+    # Check if already active
+    existing_active = await db.userasceticism.find_first(
         where={
             "userId": link.userId,
             "asceticismId": link.asceticismId,
             "status": AsceticismStatus.ACTIVE,
         }
     )
-    if existing:
-        return existing
+    if existing_active:
+        raise HTTPException(
+            status_code=400, detail="You are already tracking this asceticism"
+        )
 
-    # filter Nones & use Connect for relations
+    # Check if there's an archived one we can reactivate
+    existing_archived = await db.userasceticism.find_first(
+        where={
+            "userId": link.userId,
+            "asceticismId": link.asceticismId,
+            "status": AsceticismStatus.ARCHIVED,
+        }
+    )
+
+    # Parse dates
+    def parse_date(date_str: str) -> datetime:
+        """Parse YYYY-MM-DD or ISO datetime string to datetime"""
+        if "T" not in date_str:
+            return datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        else:
+            return datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+
+    # If archived version exists, reactivate it
+    if existing_archived:
+        update_data: dict = {
+            "status": AsceticismStatus.ACTIVE,
+            "endDate": None,  # Clear end date
+        }
+
+        if link.startDate is not None:
+            try:
+                update_data["startDate"] = parse_date(link.startDate)
+            except ValueError:
+                update_data["startDate"] = datetime.now(timezone.utc)
+        else:
+            update_data["startDate"] = datetime.now(timezone.utc)
+
+        if link.endDate is not None:
+            try:
+                update_data["endDate"] = parse_date(link.endDate)
+            except ValueError:
+                pass
+
+        if link.targetValue is not None:
+            update_data["targetValue"] = link.targetValue
+
+        return await db.userasceticism.update(
+            where={"id": existing_archived.id},
+            data=update_data,
+            include={"asceticism": True},  # type: ignore
+        )
+
+    # Otherwise create new commitment
     data: dict = {
         "user": {"connect": {"id": link.userId}},
         "asceticism": {"connect": {"id": link.asceticismId}},
     }
+
     if link.targetValue is not None:
         data["targetValue"] = link.targetValue
+
     if link.startDate is not None:
         try:
-            data["startDate"] = datetime.fromisoformat(link.startDate)
+            data["startDate"] = parse_date(link.startDate)
         except ValueError:
-            pass
+            data["startDate"] = datetime.now(timezone.utc)
+
     if link.endDate is not None:
         try:
-            data["endDate"] = datetime.fromisoformat(link.endDate)
+            data["endDate"] = parse_date(link.endDate)
         except ValueError:
             pass
+
     if link.metadata is not None:
         data["metadata"] = link.metadata
 
-    return await db.userasceticism.create(data=data)  # type: ignore
+    return await db.userasceticism.create(data=data, include={"asceticism": True})  # type: ignore
 
 
 @router.post("/asceticisms/log", tags=["asceticisms"], response_model=AsceticismLog)
@@ -284,8 +375,13 @@ async def log_daily_progress(log: LogCreate):
 @router.delete("/asceticisms/leave/{user_asceticism_id}", tags=["asceticisms"])
 async def leave_asceticism(user_asceticism_id: int):
     """
-    Leave/remove an asceticism commitment by setting status to ARCHIVED.
+    Leave/remove an asceticism commitment.
+    - If logged today: Sets endDate to end of today (keeps today's log visible)
+    - If not logged today: Sets endDate to yesterday (removes from today)
+    This preserves all historical data.
     """
+    from datetime import timezone, timedelta
+
     # Check if the user asceticism exists
     user_asceticism = await db.userasceticism.find_unique(
         where={"id": user_asceticism_id}
@@ -294,9 +390,32 @@ async def leave_asceticism(user_asceticism_id: int):
     if not user_asceticism:
         raise HTTPException(status_code=404, detail="User asceticism not found")
 
-    # Update status to ARCHIVED instead of deleting
+    # Check if there's a log for today
+    today_start = datetime.now(timezone.utc).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    today_end = datetime.now(timezone.utc).replace(
+        hour=23, minute=59, second=59, microsecond=999999
+    )
+
+    today_log = await db.asceticismlog.find_first(
+        where={
+            "userAsceticismId": user_asceticism_id,
+            "date": {"gte": today_start, "lte": today_end},
+        }
+    )
+
+    # If logged today, set endDate to end of today. Otherwise, end of yesterday.
+    if today_log:
+        end_date = today_end
+    else:
+        yesterday = datetime.now(timezone.utc) - timedelta(days=1)
+        end_date = yesterday.replace(hour=23, minute=59, second=59, microsecond=999999)
+
+    # Update status to ARCHIVED and set endDate
     await db.userasceticism.update(
-        where={"id": user_asceticism_id}, data={"status": AsceticismStatus.ARCHIVED}
+        where={"id": user_asceticism_id},
+        data={"status": AsceticismStatus.ARCHIVED, "endDate": end_date},
     )
 
     return {"message": "Successfully left asceticism"}
@@ -311,6 +430,8 @@ async def update_user_asceticism(user_asceticism_id: int, update: UserAsceticism
     """
     Update a user's asceticism commitment (dates, target value, or status).
     """
+    from datetime import timezone
+
     # Check if the user asceticism exists
     user_asceticism = await db.userasceticism.find_unique(
         where={"id": user_asceticism_id}
@@ -319,11 +440,19 @@ async def update_user_asceticism(user_asceticism_id: int, update: UserAsceticism
     if not user_asceticism:
         raise HTTPException(status_code=404, detail="User asceticism not found")
 
+    # Helper to parse dates
+    def parse_date(date_str: str) -> datetime:
+        """Parse YYYY-MM-DD or ISO datetime string to datetime"""
+        if "T" not in date_str:
+            return datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        else:
+            return datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+
     # Prepare update data
     data: dict = {}
     if update.startDate is not None:
         try:
-            data["startDate"] = datetime.fromisoformat(update.startDate)
+            data["startDate"] = parse_date(update.startDate)
         except ValueError as exc:
             raise HTTPException(
                 status_code=400, detail="Invalid startDate format"
@@ -331,7 +460,7 @@ async def update_user_asceticism(user_asceticism_id: int, update: UserAsceticism
 
     if update.endDate is not None:
         try:
-            data["endDate"] = datetime.fromisoformat(update.endDate)
+            data["endDate"] = parse_date(update.endDate)
         except ValueError as exc:
             raise HTTPException(
                 status_code=400, detail="Invalid endDate format"
@@ -359,13 +488,27 @@ async def get_user_progress(
     Get progress statistics for all user asceticisms within a date range.
     Returns completion rates, streaks, and detailed logs.
     """
+    from datetime import timezone
+
+    # Helper to parse dates
+    def parse_date(date_str: str) -> datetime:
+        """Parse YYYY-MM-DD or ISO datetime string to datetime"""
+        if "T" not in date_str:
+            return datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        else:
+            return datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+
+    # Parse the date range
+    start = parse_date(start_date)
+    end = parse_date(end_date).replace(hour=23, minute=59, second=59)
+
     # Get all active user asceticisms
     user_asceticisms = await db.userasceticism.find_many(
         where={"userId": user_id, "status": AsceticismStatus.ACTIVE},
         include={  # type: ignore
             "asceticism": True,
             "logs": {
-                "where": {"date": {"gte": start_date, "lte": end_date}},
+                "where": {"date": {"gte": start, "lte": end}},
                 "order_by": {"date": "asc"},
             },
         },
@@ -381,8 +524,6 @@ async def get_user_progress(
         logs = ua.logs or []
 
         # Calculate total days in range
-        start = datetime.fromisoformat(start_date.replace("Z", "+00:00"))
-        end = datetime.fromisoformat(end_date.replace("Z", "+00:00"))
         total_days = (end - start).days + 1
 
         # Calculate completion stats

@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useAsceticismStore } from "@/lib/stores/asceticismStore";
+import { useQueryClient } from "@tanstack/react-query";
+import { asceticismKeys } from "@/hooks/use-asceticisms";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -100,20 +103,19 @@ const TRACKING_TYPES = [
 ];
 
 interface CreateAsceticismFormProps {
-  onSuccess?: () => void;
   isAdmin?: boolean;
   userId?: number;
   disabled?: boolean;
-  onSignInClick?: () => void;
 }
 
 export default function CreateAsceticismForm({
-  onSuccess,
   isAdmin,
   userId,
   disabled = false,
-  onSignInClick,
 }: CreateAsceticismFormProps) {
+  const { openSignInDialog } = useAsceticismStore();
+  const queryClient = useQueryClient();
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -199,7 +201,12 @@ export default function CreateAsceticismForm({
         endDate: "",
       });
 
-      onSuccess?.();
+      // Invalidate queries to refetch data
+      queryClient.invalidateQueries({
+        queryKey: asceticismKeys.templates(),
+      });
+
+      toast.success("Practice created successfully!");
     } catch (error) {
       console.error("Failed to create asceticism:", error);
       toast.error("Failed to create practice", {
@@ -228,7 +235,7 @@ export default function CreateAsceticismForm({
             Design custom ascetic practices tailored to your spiritual journey.
             Sign in to start creating.
           </p>
-          <Button onClick={onSignInClick} size="lg">
+          <Button onClick={openSignInDialog} size="lg">
             Sign In to Create
           </Button>
         </div>
