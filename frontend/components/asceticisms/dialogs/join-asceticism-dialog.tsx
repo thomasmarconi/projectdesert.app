@@ -50,7 +50,7 @@ export default function JoinAsceticismDialog() {
         endDate: joinEndDate?.toISOString().split("T")[0],
       });
       closeJoinDialog();
-    } catch (e) {
+    } catch {
       // Error already handled by mutation
     }
   }

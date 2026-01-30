@@ -32,8 +32,7 @@ export default function BrowseAsceticismTemplates() {
   const userId = session?.user?.id;
 
   // TanStack Query hooks
-  const { data: templates = [], isLoading: templatesLoading } =
-    useAsceticismTemplates();
+  const { data: templates = [] } = useAsceticismTemplates();
 
   const { data: userAsceticisms = [] } = useUserAsceticisms(
     userId,

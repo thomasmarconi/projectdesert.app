@@ -14,7 +14,9 @@ import {
 import { format } from "date-fns";
 
 interface ViewNotesDialogProps {
-  getLogForDate: (ua: UserAsceticism) => any;
+  getLogForDate: (
+    ua: UserAsceticism,
+  ) => NonNullable<UserAsceticism["logs"]>[number] | undefined;
   onEdit: (ua: UserAsceticism) => void;
 }
 

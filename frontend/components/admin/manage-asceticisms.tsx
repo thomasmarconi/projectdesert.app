@@ -21,7 +21,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -112,11 +111,11 @@ export function ManageAsceticismsPage() {
   const [loading, setLoading] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editingAsceticism, setEditingAsceticism] = useState<Asceticism | null>(
-    null
+    null,
   );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [asceticismToDelete, setAsceticismToDelete] = useState<number | null>(
-    null
+    null,
   );
 
   // Form state
@@ -199,7 +198,7 @@ export function ManageAsceticismsPage() {
       setCreateDialogOpen(false);
       resetForm();
       loadAsceticisms();
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Failed to save asceticism");
       console.error(error);
     }
@@ -219,8 +218,10 @@ export function ManageAsceticismsPage() {
       setDeleteDialogOpen(false);
       setAsceticismToDelete(null);
       loadAsceticisms();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to delete asceticism");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete asceticism",
+      );
       console.error(error);
     }
   };
@@ -438,8 +439,8 @@ export function ManageAsceticismsPage() {
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently delete this asceticism template. Users who
-              have already added this practice will keep it, but new users won't
-              be able to browse and add it.
+              have already added this practice will keep it, but new users
+              won&apos;t be able to browse and add it.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

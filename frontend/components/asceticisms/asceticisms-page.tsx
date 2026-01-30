@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useUserAsceticisms, useLogProgress } from "@/hooks/use-asceticisms";
+import { useUserAsceticisms } from "@/hooks/use-asceticisms";
 import { useAsceticismStore } from "@/lib/stores/asceticismStore";
 import { UserAsceticism } from "@/lib/services/asceticismService";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

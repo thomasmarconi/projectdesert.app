@@ -69,6 +69,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: user.role,
           isBanned: user.isBanned,
         },
+        token,
       };
     },
   },

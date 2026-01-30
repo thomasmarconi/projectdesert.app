@@ -35,7 +35,7 @@ export default function RemoveAsceticismDialog({
       );
       closeRemoveDialog();
       onConfirm?.();
-    } catch (e) {
+    } catch {
       // Error already handled by mutation
     }
   }

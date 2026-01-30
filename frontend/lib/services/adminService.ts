@@ -28,7 +28,11 @@ export async function getAllUsers(): Promise<UserData[]> {
   const { data, error } = await client.GET("/admin/users");
 
   if (error) {
-    throw new Error(error.detail || "Failed to fetch users");
+    const errorMessage =
+      typeof error.detail === "string"
+        ? error.detail
+        : JSON.stringify(error.detail);
+    throw new Error(errorMessage || "Failed to fetch users");
   }
 
   return data || [];
@@ -48,7 +52,11 @@ export async function updateUserRole(userId: number, newRole: UserRole) {
   });
 
   if (error) {
-    throw new Error(error.detail || "Failed to update role");
+    const errorMessage =
+      typeof error.detail === "string"
+        ? error.detail
+        : JSON.stringify(error.detail);
+    throw new Error(errorMessage || "Failed to update role");
   }
 
   revalidatePath("/admin");
@@ -69,7 +77,11 @@ export async function toggleUserBan(userId: number, isBanned: boolean) {
   });
 
   if (error) {
-    throw new Error(error.detail || "Failed to update ban status");
+    const errorMessage =
+      typeof error.detail === "string"
+        ? error.detail
+        : JSON.stringify(error.detail);
+    throw new Error(errorMessage || "Failed to update ban status");
   }
 
   revalidatePath("/admin");

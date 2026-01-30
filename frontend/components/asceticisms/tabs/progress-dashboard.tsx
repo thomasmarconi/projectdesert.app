@@ -9,16 +9,12 @@ import {
 import { Input } from "@/components/ui/input";
 import {
   format,
-  eachDayOfInterval,
   differenceInDays,
   startOfDay,
   endOfDay,
   startOfWeek,
   addDays,
-  isSameDay,
-  subDays,
   isToday,
-  isPast,
   isFuture,
 } from "date-fns";
 import {
@@ -63,8 +59,6 @@ import {
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 
-const TEST_USER_ID = 1;
-
 type TimePeriod = "7d" | "30d" | "90d" | "180d" | "1y" | "all";
 
 interface TimePeriodOption {
@@ -90,33 +84,28 @@ export default function ProgressDashboard() {
   const [loading, setLoading] = useState(true);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("7d");
   const [searchQuery, setSearchQuery] = useState("");
-  const [hoveredDay, setHoveredDay] = useState<{
-    date: string;
-    log: ProgressLog | null;
-    asceticism: string;
-  } | null>(null);
 
   useEffect(() => {
+    async function fetchProgress() {
+      if (!userId) return;
+
+      setLoading(true);
+      try {
+        const { startDate, endDate } = getDateRange(timePeriod);
+        const data = await getUserProgress(userId, startDate, endDate);
+        setProgressData(data);
+      } catch (e) {
+        console.error("Error fetching progress:", e);
+        toast.error("Failed to load progress data");
+      } finally {
+        setLoading(false);
+      }
+    }
+
     if (userId) {
       fetchProgress();
     }
   }, [timePeriod, userId]);
-
-  async function fetchProgress() {
-    if (!userId) return;
-
-    setLoading(true);
-    try {
-      const { startDate, endDate } = getDateRange(timePeriod);
-      const data = await getUserProgress(userId, startDate, endDate);
-      setProgressData(data);
-    } catch (e) {
-      console.error("Error fetching progress:", e);
-      toast.error("Failed to load progress data");
-    } finally {
-      setLoading(false);
-    }
-  }
 
   function getDateRange(period: TimePeriod): {
     startDate: string;
@@ -294,14 +283,6 @@ export default function ProgressDashboard() {
                               ? "ring-2 ring-blue-500 ring-offset-1"
                               : ""
                           } hover:scale-125 hover:z-10`}
-                          onMouseEnter={() =>
-                            setHoveredDay({
-                              date: format(day, "PPP"),
-                              log: log || null,
-                              asceticism: asceticismTitle,
-                            })
-                          }
-                          onMouseLeave={() => setHoveredDay(null)}
                         />
                       </TooltipTrigger>
                       <TooltipContent side="top" className="max-w-xs">
@@ -401,11 +382,11 @@ export default function ProgressDashboard() {
   // Calculate achievement level based on performance
   function getAchievementLevel(stats: AsceticismProgress["stats"]): {
     level: string;
-    icon: any;
+    icon: React.ElementType;
     color: string;
     description: string;
   } {
-    const { completionRate, longestStreak, currentStreak } = stats;
+    const { completionRate, longestStreak } = stats;
 
     if (completionRate >= 90 && longestStreak >= 30) {
       return {

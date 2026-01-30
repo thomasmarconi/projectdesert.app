@@ -23,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
@@ -109,7 +108,7 @@ interface CreateAsceticismFormProps {
 }
 
 export default function CreateAsceticismForm({
-  isAdmin,
+  isAdmin: _isAdmin,
   userId,
   disabled = false,
 }: CreateAsceticismFormProps) {
@@ -359,7 +358,10 @@ export default function CreateAsceticismForm({
                     key={type.value}
                     type="button"
                     onClick={() =>
-                      setFormData({ ...formData, type: type.value as any })
+                      setFormData({
+                        ...formData,
+                        type: type.value as "BOOLEAN" | "NUMERIC" | "TEXT",
+                      })
                     }
                     disabled={disabled}
                     className={`

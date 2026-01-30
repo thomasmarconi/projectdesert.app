@@ -32,8 +32,7 @@ frontend/
 │   ├── admin/             # Admin dashboard and management
 │   ├── asceticisms/       # Asceticism tracking pages
 │   ├── daily-readings/    # Daily Mass readings
-│   ├── packages/          # Practice packages browsing
-│   └── settings/          # User settings
+│   └── packages/          # Practice packages browsing
 ├── components/            # React components
 │   ├── admin/            # Admin-specific components
 │   ├── asceticisms/      # Asceticism tracking UI

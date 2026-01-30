@@ -71,7 +71,7 @@ export default function LogProgressDialog() {
 
       toast.success(existingLog ? "Progress updated!" : "Progress logged!");
       closeLogDialog();
-    } catch (e) {
+    } catch {
       // Error already handled by mutation
     }
   }

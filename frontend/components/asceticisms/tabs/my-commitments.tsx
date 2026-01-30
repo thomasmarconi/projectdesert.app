@@ -38,13 +38,16 @@ import {
   FileText,
 } from "lucide-react";
 import { UserAsceticism } from "@/lib/services/asceticismService";
+import type { Session } from "next-auth";
 
 interface MyCommitmentsProps {
-  session: any;
+  session: Session | null;
   userId?: string;
   myAsceticisms: UserAsceticism[];
   handleLogClick: (ua: UserAsceticism) => void;
-  getLogForDate: (ua: UserAsceticism) => any;
+  getLogForDate: (
+    ua: UserAsceticism,
+  ) => NonNullable<UserAsceticism["logs"]>[number] | undefined;
 }
 
 export default function MyCommitments({
@@ -90,7 +93,7 @@ export default function MyCommitments({
         completed: true,
       });
       toast.success("Completed!");
-    } catch (e) {
+    } catch {
       // Error already handled by mutation
     }
   }
@@ -139,7 +142,7 @@ export default function MyCommitments({
       );
 
       toast.success(`Completed ${booleanAsceticisms.length} practices!`);
-    } catch (e) {
+    } catch {
       toast.error("Failed to complete all practices.");
     } finally {
       setCompletingAll(false);
@@ -352,7 +355,7 @@ export default function MyCommitments({
                     )}
                     {logEntry.notes && (
                       <span className="line-clamp-1 italic text-purple-600 dark:text-purple-400">
-                        "{logEntry.notes}"
+                        &quot;{logEntry.notes}&quot;
                       </span>
                     )}
                   </div>
