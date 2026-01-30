@@ -16,13 +16,11 @@ import { format } from "date-fns";
 interface ViewNotesDialogProps {
   getLogForDate: (ua: UserAsceticism) => any;
   onEdit: (ua: UserAsceticism) => void;
-  isViewingFuture: boolean;
 }
 
 export default function ViewNotesDialog({
   getLogForDate,
   onEdit,
-  isViewingFuture,
 }: ViewNotesDialogProps) {
   const {
     notesDialogOpen,
@@ -34,6 +32,13 @@ export default function ViewNotesDialog({
   const log = viewingNotesAsceticism
     ? getLogForDate(viewingNotesAsceticism)
     : null;
+
+  function isViewingFuture(): boolean {
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+    const viewingStr = viewingDate.toISOString().split("T")[0];
+    return viewingStr > todayStr;
+  }
 
   return (
     <Dialog open={notesDialogOpen} onOpenChange={closeNotesDialog}>
@@ -87,7 +92,7 @@ export default function ViewNotesDialog({
               }
             }}
             className="h-10 px-6"
-            disabled={isViewingFuture}
+            disabled={isViewingFuture()}
           >
             Edit
           </Button>

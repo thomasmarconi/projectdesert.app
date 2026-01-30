@@ -1,20 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import { useSession } from "next-auth/react";
 import {
   useAsceticismTemplates,
   useUserAsceticisms,
-  useJoinAsceticism,
   useLogProgress,
-  useLeaveAsceticism,
 } from "@/hooks/use-asceticisms";
 import { useAsceticismStore } from "@/lib/stores/asceticismStore";
 import { UserAsceticism } from "@/lib/services/asceticismService";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { Sparkles, BarChart3 } from "lucide-react";
 import CreateAsceticismForm from "./tabs/create-asceticism-form";
 import ProgressDashboard from "./tabs/progress-dashboard";
@@ -31,16 +27,9 @@ export default function AsceticismsPage() {
   const userId = session?.user?.id;
   const isAdmin = session?.user?.role === "ADMIN";
 
-  const [completingAll, setCompletingAll] = useState(false);
-
   // Zustand store
-  const {
-    viewingDate,
-    showArchived,
-    openLogDialog,
-    openRemoveDialog,
-    openSignInDialog,
-  } = useAsceticismStore();
+  const { viewingDate, showArchived, openLogDialog, openSignInDialog } =
+    useAsceticismStore();
 
   // TanStack Query hooks
   const { data: templates = [], isLoading: templatesLoading } =
@@ -57,8 +46,6 @@ export default function AsceticismsPage() {
     true,
   );
 
-  const logMutation = useLogProgress();
-
   const loading = templatesLoading || (userId && myAsceticismsLoading);
 
   // === Log Handlers ===
@@ -71,72 +58,7 @@ export default function AsceticismsPage() {
     );
   }
 
-  async function handleQuickLog(ua: UserAsceticism) {
-    const date = viewingDate.toISOString().split("T")[0];
-    try {
-      await logMutation.mutateAsync({
-        userAsceticismId: ua.id,
-        date,
-        completed: true,
-      });
-      toast.success("Completed!");
-    } catch (e) {
-      // Error already handled by mutation
-    }
-  }
-
-  // === Complete All Boolean ===
-  async function handleCompleteAll() {
-    if (isViewingFuture()) {
-      toast.error("Cannot log progress for future dates");
-      return;
-    }
-
-    setCompletingAll(true);
-    try {
-      const booleanAsceticisms = myAsceticisms.filter(
-        (ua) => ua.asceticism?.type === "BOOLEAN" && !hasLoggedOnDate(ua),
-      );
-
-      if (booleanAsceticisms.length === 0) {
-        toast.info("All boolean practices already completed!");
-        return;
-      }
-
-      const date = viewingDate.toISOString().split("T")[0];
-      await Promise.all(
-        booleanAsceticisms.map((ua) =>
-          logMutation.mutateAsync({
-            userAsceticismId: ua.id,
-            date,
-            completed: true,
-          }),
-        ),
-      );
-
-      toast.success(`Completed ${booleanAsceticisms.length} practices!`);
-    } catch (e) {
-      toast.error("Failed to complete all practices.");
-    } finally {
-      setCompletingAll(false);
-    }
-  }
-
-  // === Remove Handler ===
-  function handleRemoveClick(userAsceticismId: number, title: string) {
-    openRemoveDialog(userAsceticismId, title);
-  }
-
   // === Helper Functions ===
-  function hasLoggedOnDate(ua: UserAsceticism): boolean {
-    const dateStr = viewingDate.toISOString().split("T")[0];
-    const logs = ua.logs || [];
-    return logs.some((log) => {
-      const logDate = new Date(log.date).toISOString().split("T")[0];
-      return logDate === dateStr && log.completed;
-    });
-  }
-
   function getLogForDate(ua: UserAsceticism) {
     const dateStr = viewingDate.toISOString().split("T")[0];
     const logs = ua.logs || [];
@@ -144,21 +66,6 @@ export default function AsceticismsPage() {
       const logDate = new Date(log.date).toISOString().split("T")[0];
       return logDate === dateStr;
     });
-  }
-
-  function isViewingToday(): boolean {
-    const today = new Date();
-    return (
-      viewingDate.toISOString().split("T")[0] ===
-      today.toISOString().split("T")[0]
-    );
-  }
-
-  function isViewingFuture(): boolean {
-    const today = new Date();
-    const todayStr = today.toISOString().split("T")[0];
-    const viewingStr = viewingDate.toISOString().split("T")[0];
-    return viewingStr > todayStr;
   }
 
   if (loading && userId) {
@@ -207,15 +114,8 @@ export default function AsceticismsPage() {
             session={session}
             userId={userId}
             myAsceticisms={myAsceticisms}
-            completingAll={completingAll}
             handleLogClick={handleLogClick}
-            handleQuickLog={handleQuickLog}
-            handleCompleteAll={handleCompleteAll}
-            handleRemoveClick={handleRemoveClick}
-            hasLoggedOnDate={hasLoggedOnDate}
             getLogForDate={getLogForDate}
-            isViewingToday={isViewingToday}
-            isViewingFuture={isViewingFuture}
           />
         </TabsContent>
 
@@ -261,11 +161,7 @@ export default function AsceticismsPage() {
 
       <JoinAsceticismDialog />
       <LogProgressDialog />
-      <ViewNotesDialog
-        getLogForDate={getLogForDate}
-        onEdit={handleLogClick}
-        isViewingFuture={isViewingFuture()}
-      />
+      <ViewNotesDialog getLogForDate={getLogForDate} onEdit={handleLogClick} />
       <RemoveAsceticismDialog />
       <SignInPromptDialog />
     </div>

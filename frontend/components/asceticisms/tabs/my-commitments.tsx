@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useAsceticismStore } from "@/lib/stores/asceticismStore";
+import { useLogProgress } from "@/hooks/use-asceticisms";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
@@ -40,31 +43,19 @@ interface MyCommitmentsProps {
   session: any;
   userId?: string;
   myAsceticisms: UserAsceticism[];
-  completingAll: boolean;
   handleLogClick: (ua: UserAsceticism) => void;
-  handleQuickLog: (ua: UserAsceticism) => void;
-  handleCompleteAll: () => void;
-  handleRemoveClick: (id: number, title: string) => void;
-  hasLoggedOnDate: (ua: UserAsceticism) => boolean;
   getLogForDate: (ua: UserAsceticism) => any;
-  isViewingToday: () => boolean;
-  isViewingFuture: () => boolean;
 }
 
 export default function MyCommitments({
   session,
   userId,
   myAsceticisms,
-  completingAll,
   handleLogClick,
-  handleQuickLog,
-  handleCompleteAll,
-  handleRemoveClick,
-  hasLoggedOnDate,
   getLogForDate,
-  isViewingToday,
-  isViewingFuture,
 }: MyCommitmentsProps) {
+  const [completingAll, setCompletingAll] = useState(false);
+
   const {
     viewingDate,
     setViewingDate,
@@ -72,7 +63,88 @@ export default function MyCommitments({
     setShowArchived,
     openNotesDialog,
     openSignInDialog,
+    openRemoveDialog,
   } = useAsceticismStore();
+
+  const logMutation = useLogProgress();
+
+  function hasLoggedOnDate(ua: UserAsceticism): boolean {
+    const dateStr = viewingDate.toISOString().split("T")[0];
+    const logs = ua.logs || [];
+    return logs.some((log) => {
+      const logDate = new Date(log.date).toISOString().split("T")[0];
+      return logDate === dateStr && log.completed;
+    });
+  }
+
+  function handleRemoveClick(userAsceticismId: number, title: string) {
+    openRemoveDialog(userAsceticismId, title);
+  }
+
+  async function handleQuickLog(ua: UserAsceticism) {
+    const date = viewingDate.toISOString().split("T")[0];
+    try {
+      await logMutation.mutateAsync({
+        userAsceticismId: ua.id,
+        date,
+        completed: true,
+      });
+      toast.success("Completed!");
+    } catch (e) {
+      // Error already handled by mutation
+    }
+  }
+
+  function isViewingToday(): boolean {
+    const today = new Date();
+    return (
+      viewingDate.toISOString().split("T")[0] ===
+      today.toISOString().split("T")[0]
+    );
+  }
+
+  function isViewingFuture(): boolean {
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+    const viewingStr = viewingDate.toISOString().split("T")[0];
+    return viewingStr > todayStr;
+  }
+
+  async function handleCompleteAll() {
+    if (isViewingFuture()) {
+      toast.error("Cannot log progress for future dates");
+      return;
+    }
+
+    setCompletingAll(true);
+    try {
+      const booleanAsceticisms = myAsceticisms.filter(
+        (ua) => ua.asceticism?.type === "BOOLEAN" && !hasLoggedOnDate(ua),
+      );
+
+      if (booleanAsceticisms.length === 0) {
+        toast.info("All boolean practices already completed!");
+        return;
+      }
+
+      const date = viewingDate.toISOString().split("T")[0];
+      await Promise.all(
+        booleanAsceticisms.map((ua) =>
+          logMutation.mutateAsync({
+            userAsceticismId: ua.id,
+            date,
+            completed: true,
+          }),
+        ),
+      );
+
+      toast.success(`Completed ${booleanAsceticisms.length} practices!`);
+    } catch (e) {
+      toast.error("Failed to complete all practices.");
+    } finally {
+      setCompletingAll(false);
+    }
+  }
   function goToPreviousDay() {
     const newDate = new Date(viewingDate);
     newDate.setDate(newDate.getDate() - 1);
