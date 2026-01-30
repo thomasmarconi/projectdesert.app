@@ -373,7 +373,7 @@ export default function CreateAsceticismForm({
                     `}
                   >
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span
                           className={`font-semibold text-sm ${
                             isSelected ? "text-primary" : ""
@@ -472,11 +472,15 @@ export default function CreateAsceticismForm({
                     <div className="text-sm text-muted-foreground flex items-center gap-2">
                       <span className="font-medium">Duration:</span>
                       {formData.startDate
-                        ? new Date(formData.startDate).toLocaleDateString()
+                        ? new Date(
+                            formData.startDate + "T00:00:00",
+                          ).toLocaleDateString()
                         : "Now"}
                       {" - "}
                       {formData.endDate
-                        ? new Date(formData.endDate).toLocaleDateString()
+                        ? new Date(
+                            formData.endDate + "T00:00:00",
+                          ).toLocaleDateString()
                         : "Ongoing"}
                     </div>
                   )}
