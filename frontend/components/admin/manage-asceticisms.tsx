@@ -42,12 +42,12 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import {
-  getAsceticisms,
-  createAsceticism,
-  updateAsceticism,
-  deleteAsceticism,
-  Asceticism,
-} from "@/lib/services/asceticismService";
+  getAsceticismsAction,
+  createAsceticismAction,
+  updateAsceticismAction,
+  deleteAsceticismAction,
+} from "@/lib/actions/asceticismActions";
+import type { Asceticism } from "@/lib/services/asceticismService";
 import {
   Sparkles,
   Plus,
@@ -133,7 +133,7 @@ export function ManageAsceticismsPage() {
   const loadAsceticisms = async () => {
     try {
       setLoading(true);
-      const data = await getAsceticisms();
+      const data = await getAsceticismsAction();
       setAsceticisms(data);
     } catch (error) {
       toast.error("Failed to load asceticisms");
@@ -187,11 +187,11 @@ export function ManageAsceticismsPage() {
 
       if (editingAsceticism) {
         // Update existing
-        await updateAsceticism(editingAsceticism.id, asceticismData);
+        await updateAsceticismAction(editingAsceticism.id, asceticismData);
         toast.success("Asceticism updated successfully");
       } else {
         // Create new
-        await createAsceticism(asceticismData);
+        await createAsceticismAction(asceticismData);
         toast.success("Asceticism created successfully");
       }
 
@@ -215,7 +215,7 @@ export function ManageAsceticismsPage() {
     if (!session?.user?.email || !asceticismToDelete) return;
 
     try {
-      await deleteAsceticism(asceticismToDelete);
+      await deleteAsceticismAction(asceticismToDelete);
       toast.success("Asceticism deleted successfully");
       setDeleteDialogOpen(false);
       setAsceticismToDelete(null);

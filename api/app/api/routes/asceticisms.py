@@ -347,9 +347,39 @@ async def join_asceticism(
 
         # Load asceticism
         asceticism = session.get(Asceticism, existing_archived.asceticismId)
+
+        # Load logs
+        logs_stmt = select(AsceticismLog).where(
+            AsceticismLog.userAsceticismId == existing_archived.id
+        )
+        logs = session.exec(logs_stmt).all()
+
         return {
-            **existing_archived.model_dump(),
-            "asceticism": asceticism.model_dump() if asceticism else None,
+            "id": existing_archived.id,
+            "userId": existing_archived.userId,
+            "asceticismId": existing_archived.asceticismId,
+            "status": existing_archived.status.value,
+            "startDate": (
+                existing_archived.startDate.isoformat()
+                if existing_archived.startDate
+                else None
+            ),
+            "endDate": (
+                existing_archived.endDate.isoformat()
+                if existing_archived.endDate
+                else None
+            ),
+            "targetValue": existing_archived.targetValue,
+            "reminderTime": (
+                existing_archived.reminderTime.isoformat()
+                if existing_archived.reminderTime
+                else None
+            ),
+            "custom_metadata": existing_archived.custom_metadata,
+            "createdAt": existing_archived.createdAt.isoformat(),
+            "updatedAt": existing_archived.updatedAt.isoformat(),
+            "asceticism": asceticism,
+            "logs": logs,
         }
 
     # Create new commitment
@@ -370,9 +400,30 @@ async def join_asceticism(
 
     # Load asceticism
     asceticism = session.get(Asceticism, user_asceticism.asceticismId)
+
+    # New user asceticisms have no logs yet
     return {
-        **user_asceticism.model_dump(),
-        "asceticism": asceticism.model_dump() if asceticism else None,
+        "id": user_asceticism.id,
+        "userId": user_asceticism.userId,
+        "asceticismId": user_asceticism.asceticismId,
+        "status": user_asceticism.status.value,
+        "startDate": (
+            user_asceticism.startDate.isoformat() if user_asceticism.startDate else None
+        ),
+        "endDate": (
+            user_asceticism.endDate.isoformat() if user_asceticism.endDate else None
+        ),
+        "targetValue": user_asceticism.targetValue,
+        "reminderTime": (
+            user_asceticism.reminderTime.isoformat()
+            if user_asceticism.reminderTime
+            else None
+        ),
+        "custom_metadata": user_asceticism.custom_metadata,
+        "createdAt": user_asceticism.createdAt.isoformat(),
+        "updatedAt": user_asceticism.updatedAt.isoformat(),
+        "asceticism": asceticism,
+        "logs": [],
     }
 
 

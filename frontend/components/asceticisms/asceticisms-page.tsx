@@ -7,6 +7,7 @@ import ProgressDashboard from "./tabs/progress-dashboard";
 import BrowseAsceticismTemplates from "./tabs/browse-asceticism-templates";
 import MyCommitments from "./tabs/my-commitments";
 import SignInPromptDialog from "./dialogs/sign-in-prompt-dialog";
+import RemoveAsceticismDialog from "@/components/asceticisms/dialogs/remove-asceticism-dialog";
 
 export default function AsceticismsPage() {
   return (
@@ -58,6 +59,8 @@ export default function AsceticismsPage() {
       </Tabs>
 
       <SignInPromptDialog />
+      {/*  This needs to be here since the MyCommitments and BrowseAsceticisms tabs both use it */}
+      <RemoveAsceticismDialog />
     </div>
   );
 }

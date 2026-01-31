@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import {
-  getUserProgress,
-  AsceticismProgress,
-} from "@/lib/services/asceticismService";
+import { AsceticismProgress } from "@/lib/services/asceticismService";
+import { getUserProgressAction } from "@/lib/actions/asceticismActions";
 import { Input } from "@/components/ui/input";
 import {
   format,
@@ -100,7 +98,7 @@ export default function ProgressDashboard() {
       setLoading(true);
       try {
         const { startDate, endDate } = getDateRange(timePeriod);
-        const data = await getUserProgress(userId, startDate, endDate);
+        const data = await getUserProgressAction(userId, startDate, endDate);
         setProgressData(data);
       } catch (e) {
         console.error("Error fetching progress:", e);
@@ -217,8 +215,8 @@ export default function ProgressDashboard() {
     const getIntensity = (completed: boolean, hasNotes: boolean): string => {
       if (!completed) return "bg-muted/40 border-muted";
       if (hasNotes)
-        return "bg-green-600 dark:bg-green-500 border-green-700 dark:border-green-600";
-      return "bg-green-500 dark:bg-green-600 border-green-600 dark:border-green-700";
+        return "bg-green-700 dark:bg-green-600 border-green-800 dark:border-green-700";
+      return "bg-green-400 dark:bg-green-500 border-green-500 dark:border-green-600";
     };
 
     if (allDays.length === 0) {
