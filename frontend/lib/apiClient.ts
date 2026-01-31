@@ -24,7 +24,6 @@ async function getJWTToken(userEmail?: string): Promise<string | null> {
     const jwt = await import("jsonwebtoken");
 
     const session = await auth();
-    console.log("Session:", session ? "exists" : "null", session?.user?.email);
 
     if (!session || !session.user) {
       console.log("No session found - user not authenticated");
@@ -58,7 +57,6 @@ async function getJWTToken(userEmail?: string): Promise<string | null> {
       { algorithm: "HS256" },
     );
 
-    console.log("JWT token created successfully for", session.user.email);
     return token;
   } else {
     // Client-side: This should not be called directly from client components
@@ -92,7 +90,6 @@ export async function getApiClient(userEmail?: string) {
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
-    console.log("Authorization header added to API client");
   } else {
     console.log("No token available - API client will be unauthenticated");
   }
@@ -102,12 +99,6 @@ export async function getApiClient(userEmail?: string) {
     headers,
   });
 }
-
-/**
- * Legacy alias for getApiClient - prefer using getApiClient
- * @deprecated Use getApiClient instead
- */
-export const createAuthClient = getApiClient;
 
 /**
  * Unauthenticated client for public endpoints only.

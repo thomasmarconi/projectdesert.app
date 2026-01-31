@@ -33,8 +33,6 @@ export default async function AdminPage() {
   // Fetch all users
   const users = await getAllUsers();
 
-  console.log(users);
-
   return (
     <div className="container mx-auto py-10 space-y-8">
       <div className="space-y-2">

@@ -3,7 +3,7 @@
 ## Import the Client
 
 ```typescript
-import { client, createAuthClient } from "@/lib/apiClient";
+import { client, getApiClient } from "@/lib/apiClient";
 import type { components } from "@/types/api";
 ```
 
@@ -61,7 +61,7 @@ const { data, error } = await client.POST("/asceticisms/join", {
 
 ```typescript
 // Create an authenticated client
-const authClient = createAuthClient(userEmail);
+const authClient = await getApiClient(userEmail);
 
 // Use it for admin endpoints
 const { data, error } = await authClient.GET("/admin/users");
@@ -118,12 +118,10 @@ return data;
 ```typescript
 "use server";
 
-import { auth } from "@/auth";
-import { createAuthClient } from "@/lib/apiClient";
+import { getApiClient } from "@/lib/apiClient";
 
 export async function myServerAction() {
-  const session = await auth();
-  const client = createAuthClient(session?.user?.email);
+  const client = await getApiClient();
   
   const { data, error } = await client.POST("/some-endpoint", {
     body: { /* ... */ },
@@ -204,7 +202,7 @@ npx openapi-typescript http://localhost:8000/openapi.json -o types/api.ts
 
 1. ✅ Always use the typed client instead of raw `fetch`
 2. ✅ Check both `data` and `error` in responses
-3. ✅ Use `createAuthClient()` for authenticated endpoints
+3. ✅ Use `await getApiClient()` for authenticated endpoints (handles auth automatically)
 4. ✅ Regenerate types after backend changes
 5. ✅ Use type imports (`import type`) for type-only imports
 6. ❌ Avoid `any` - the types are already generated
