@@ -5,6 +5,7 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException, Header, Depends
 from sqlmodel import Session, select
 from app.core.database import get_session
+from app.core.auth import require_admin, require_authenticated_user
 from app.models import (
     AsceticismPackage,
     PackageItem,
@@ -24,51 +25,6 @@ from app.schemas.packages import (
 )
 
 router = APIRouter(prefix="/packages", tags=["packages"])
-
-
-async def get_user_by_email(email: str, session: Session) -> Optional[User]:
-    """Get user by email."""
-    statement = select(User).where(User.email == email)
-    return session.exec(statement).first()
-
-
-async def require_admin(x_user_email: Optional[str], session: Session) -> User:
-    """Verify that the user is an admin."""
-    if not x_user_email:
-        raise HTTPException(status_code=401, detail="Unauthorized: Not logged in")
-
-    user = await get_user_by_email(x_user_email, session)
-
-    if not user:
-        raise HTTPException(status_code=401, detail="Unauthorized: User not found")
-
-    if user.isBanned:
-        raise HTTPException(status_code=403, detail="Unauthorized: User is banned")
-
-    if user.role != UserRole.ADMIN:
-        raise HTTPException(
-            status_code=403, detail="Unauthorized: Admin access required"
-        )
-
-    return user
-
-
-async def require_authenticated_user(
-    x_user_email: Optional[str], session: Session
-) -> User:
-    """Verify that the user is authenticated."""
-    if not x_user_email:
-        raise HTTPException(status_code=401, detail="Unauthorized: Not logged in")
-
-    user = await get_user_by_email(x_user_email, session)
-
-    if not user:
-        raise HTTPException(status_code=401, detail="Unauthorized: User not found")
-
-    if user.isBanned:
-        raise HTTPException(status_code=403, detail="Unauthorized: User is banned")
-
-    return user
 
 
 def format_package_response(

@@ -203,8 +203,6 @@ export default function CreateAsceticismForm({
       queryClient.invalidateQueries({
         queryKey: asceticismKeys.templates(),
       });
-
-      toast.success("Practice created successfully!");
     } catch (error) {
       console.error("Failed to create asceticism:", error);
       toast.error("Failed to create practice", {
@@ -412,9 +410,15 @@ export default function CreateAsceticismForm({
                   id="startDate"
                   type="date"
                   value={formData.startDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, startDate: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const newStartDate = e.target.value;
+                    setFormData({
+                      ...formData,
+                      startDate: newStartDate,
+                      // Clear end date if it's now before the new start date
+                      endDate: formData.endDate && formData.endDate < newStartDate ? "" : formData.endDate,
+                    });
+                  }}
                 />
               </div>
               <div className="space-y-2">
@@ -425,9 +429,10 @@ export default function CreateAsceticismForm({
                   id="endDate"
                   type="date"
                   value={formData.endDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, endDate: e.target.value })
-                  }
+                  min={formData.startDate || undefined}
+                  onChange={(e) => {
+                    setFormData({ ...formData, endDate: e.target.value });
+                  }}
                 />
               </div>
             </div>
@@ -491,7 +496,7 @@ export default function CreateAsceticismForm({
           )}
         </CardContent>
 
-        <CardFooter className="flex gap-3">
+        <CardFooter className="flex gap-3 pt-6">
           <Button
             type="button"
             variant="outline"

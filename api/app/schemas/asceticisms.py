@@ -2,8 +2,34 @@
 
 from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from ..models import TrackingType, AsceticismStatus
+
+
+def parse_date(date_str: Optional[str]) -> Optional[datetime]:
+    """Parse a date string to datetime."""
+    if not date_str:
+        return None
+    try:
+        return datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+    except ValueError:
+        return datetime.strptime(date_str, "%Y-%m-%d")
+
+
+class DateRangeValidatorMixin(BaseModel):
+    """Mixin that validates startDate comes before endDate."""
+
+    startDate: Optional[str] = None
+    endDate: Optional[str] = None
+
+    @model_validator(mode="after")
+    def validate_dates(self):
+        if self.startDate and self.endDate:
+            start = parse_date(self.startDate)
+            end = parse_date(self.endDate)
+            if start and end and end < start:
+                raise ValueError("End date cannot be before start date")
+        return self
 
 
 class AsceticismCreate(BaseModel):
@@ -36,14 +62,12 @@ class AsceticismResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class UserAsceticismLink(BaseModel):
+class UserAsceticismLink(DateRangeValidatorMixin):
     """Request to link user to asceticism."""
 
     userId: int
     asceticismId: int
     targetValue: Optional[float] = None
-    startDate: Optional[str] = None
-    endDate: Optional[str] = None
     custom_metadata: Optional[dict] = None
 
 
@@ -65,11 +89,9 @@ class UserAsceticismResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class UserAsceticismUpdate(BaseModel):
+class UserAsceticismUpdate(DateRangeValidatorMixin):
     """Request to update user asceticism."""
 
-    startDate: Optional[str] = None
-    endDate: Optional[str] = None
     targetValue: Optional[float] = None
     status: Optional[AsceticismStatus] = None
 

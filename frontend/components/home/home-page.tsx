@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import SignIn from "@/components/auth/sign-in";
 import { SignOut } from "@/components/auth/sign-out";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -75,121 +76,129 @@ export default async function HomePage() {
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Asceticisms Feature */}
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="mb-2">
-                <span className="text-4xl">🎯</span>
-              </div>
-              <CardTitle>Asceticisms</CardTitle>
-              <CardDescription>
-                Personal spiritual practices and disciplines
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-start space-x-2">
-                  <Badge variant="outline" className="mt-1">
-                    Browse
-                  </Badge>
-                  <p className="text-sm text-muted-foreground">
-                    Explore and discover various spiritual practices
-                  </p>
+          <Link href="/asceticisms">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <div className="mb-2">
+                  <span className="text-4xl">🎯</span>
                 </div>
-                <div className="flex items-start space-x-2">
-                  <Badge variant="outline" className="mt-1">
-                    Progress
-                  </Badge>
-                  <p className="text-sm text-muted-foreground">
-                    Track your journey and see your growth over time
-                  </p>
+                <CardTitle>Asceticisms</CardTitle>
+                <CardDescription>
+                  Personal spiritual practices and disciplines
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-2">
+                    <Badge variant="outline" className="mt-1">
+                      Browse
+                    </Badge>
+                    <p className="text-sm text-muted-foreground">
+                      Explore and discover various spiritual practices
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <Badge variant="outline" className="mt-1">
+                      Progress
+                    </Badge>
+                    <p className="text-sm text-muted-foreground">
+                      Track your journey and see your growth over time
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <Badge variant="outline" className="mt-1">
+                      Create
+                    </Badge>
+                    <p className="text-sm text-muted-foreground">
+                      Design custom practices tailored to your spiritual path
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-start space-x-2">
-                  <Badge variant="outline" className="mt-1">
-                    Create
-                  </Badge>
-                  <p className="text-sm text-muted-foreground">
-                    Design custom practices tailored to your spiritual path
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
 
           {/* Packages Feature */}
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="mb-2">
-                <span className="text-4xl">📦</span>
-              </div>
-              <CardTitle>Packages</CardTitle>
-              <CardDescription>
-                Curated collections of practices
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Discover thoughtfully assembled packages that combine multiple
-                asceticisms into cohesive spiritual programs.
-              </p>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm">✓</span>
-                  <p className="text-sm text-muted-foreground">
-                    Pre-built spiritual programs
-                  </p>
+          <Link href="/packages">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="mb-2">
+                  <span className="text-4xl">📦</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm">✓</span>
-                  <p className="text-sm text-muted-foreground">
-                    Structured learning paths
-                  </p>
+                <CardTitle>Packages</CardTitle>
+                <CardDescription>
+                  Curated collections of practices
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Discover thoughtfully assembled packages that combine multiple
+                  asceticisms into cohesive spiritual programs.
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm">✓</span>
+                    <p className="text-sm text-muted-foreground">
+                      Pre-built spiritual programs
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm">✓</span>
+                    <p className="text-sm text-muted-foreground">
+                      Structured learning paths
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm">✓</span>
+                    <p className="text-sm text-muted-foreground">
+                      Community-shared collections
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm">✓</span>
-                  <p className="text-sm text-muted-foreground">
-                    Community-shared collections
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
 
           {/* Daily Readings Feature */}
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="mb-2">
-                <span className="text-4xl">📖</span>
-              </div>
-              <CardTitle>Daily Readings</CardTitle>
-              <CardDescription>Spiritual nourishment every day</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Start each day with inspiring readings, reflections, and
-                meditations to guide your spiritual practice.
-              </p>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm">✓</span>
-                  <p className="text-sm text-muted-foreground">
-                    Daily inspiration and guidance
-                  </p>
+          <Link href="/daily-readings">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="mb-2">
+                  <span className="text-4xl">📖</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm">✓</span>
-                  <p className="text-sm text-muted-foreground">
-                    Scripture and wisdom
-                  </p>
+                <CardTitle>Daily Readings</CardTitle>
+                <CardDescription>
+                  Spiritual nourishment every day
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Start each day with inspiring readings, reflections, and
+                  meditations to guide your spiritual practice.
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm">✓</span>
+                    <p className="text-sm text-muted-foreground">
+                      Daily inspiration and guidance
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm">✓</span>
+                    <p className="text-sm text-muted-foreground">
+                      Scripture and wisdom
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm">✓</span>
+                    <p className="text-sm text-muted-foreground">
+                      Reflection prompts
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm">✓</span>
-                  <p className="text-sm text-muted-foreground">
-                    Reflection prompts
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </div>
 

@@ -102,7 +102,12 @@ export const useAsceticismStore = create<AsceticismStore>((set) => ({
       joinDialogOpen: false,
       selectedTemplate: null,
     }),
-  setJoinStartDate: (date) => set({ joinStartDate: date }),
+  setJoinStartDate: (date) =>
+    set((state) => ({
+      joinStartDate: date,
+      // Clear end date if it's now before the new start date
+      joinEndDate: state.joinEndDate && date && state.joinEndDate < date ? undefined : state.joinEndDate,
+    })),
   setJoinEndDate: (date) => set({ joinEndDate: date }),
 
   openLogDialog: (ua, existingValue = "", existingNotes = "") =>

@@ -120,6 +120,7 @@ export default function JoinAsceticismDialog() {
                   mode="single"
                   selected={joinEndDate}
                   onSelect={setJoinEndDate}
+                  disabled={joinStartDate ? { before: joinStartDate } : undefined}
                   initialFocus
                 />
               </PopoverContent>
