@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAsceticismStore } from "@/lib/stores/asceticismStore";
-import { useLogProgress } from "@/hooks/use-asceticisms";
+import { useLogProgress, useUserAsceticisms } from "@/hooks/use-asceticisms";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -38,38 +38,69 @@ import {
   FileText,
 } from "lucide-react";
 import { UserAsceticism } from "@/lib/services/asceticismService";
-import type { Session } from "next-auth";
+import { auth } from "@/auth";
+import ViewNotesDialog from "@/components/asceticisms/dialogs/view-notes-dialog";
+import LogProgressDialog from "@/components/asceticisms/dialogs/log-progress-dialog";
+import RemoveAsceticismDialog from "@/components/asceticisms/dialogs/remove-asceticism-dialog";
 
-interface MyCommitmentsProps {
-  session: Session | null;
-  userId?: string;
-  myAsceticisms: UserAsceticism[];
-  handleLogClick: (ua: UserAsceticism) => void;
-  getLogForDate: (
-    ua: UserAsceticism,
-  ) => NonNullable<UserAsceticism["logs"]>[number] | undefined;
-}
+export default async function MyCommitments({}) {
+  const session = await auth();
+  const userId = session?.user?.id;
 
-export default function MyCommitments({
-  session,
-  userId,
-  myAsceticisms,
-  handleLogClick,
-  getLogForDate,
-}: MyCommitmentsProps) {
-  const [completingAll, setCompletingAll] = useState(false);
-
+  // Zustand store
   const {
     viewingDate,
+    setLoading,
+    openSignInDialog,
     setViewingDate,
     showArchived,
     setShowArchived,
     openNotesDialog,
-    openSignInDialog,
     openRemoveDialog,
-  } = useAsceticismStore();
+    openLogDialog,
+  } = useAsceticismStore((state) => ({
+    viewingDate: state.viewingDate,
+    setLoading: state.setLoading,
+    openSignInDialog: state.openSignInDialog,
+    setViewingDate: state.setViewingDate,
+    showArchived: state.showArchived,
+    setShowArchived: state.setShowArchived,
+    openNotesDialog: state.openNotesDialog,
+    openRemoveDialog: state.openRemoveDialog,
+    openLogDialog: state.openLogDialog,
+  }));
+
+  // TanStack Query hooks
+  const dateStr = viewingDate.toISOString().split("T")[0];
+
+  const { data: myAsceticisms = [], isLoading: myAsceticismsLoading } =
+    useUserAsceticisms(userId, dateStr, dateStr, showArchived);
+
+  setLoading(userId !== null && myAsceticismsLoading);
+
+  const [completingAll, setCompletingAll] = useState(false);
 
   const logMutation = useLogProgress();
+
+  // === Log Handlers ===
+  function handleLogClick(ua: UserAsceticism) {
+    const existingLog = getLogForDate(ua);
+    openLogDialog(
+      ua,
+      existingLog?.value?.toString() || "",
+      existingLog?.notes || "",
+    );
+  }
+
+  // === Helper Functions ===
+  function getLogForDate(ua: UserAsceticism) {
+    const dateStr = viewingDate.toISOString().split("T")[0];
+    const logs = ua.logs || [];
+    return logs.find((log) => {
+      const logDate = new Date(log.date).toISOString().split("T")[0];
+      return logDate === dateStr;
+    });
+  }
 
   function hasLoggedOnDate(ua: UserAsceticism): boolean {
     const dateStr = viewingDate.toISOString().split("T")[0];
@@ -458,6 +489,9 @@ export default function MyCommitments({
           </div>
         )}
       </div>
+      <ViewNotesDialog getLogForDate={getLogForDate} onEdit={handleLogClick} />
+      <LogProgressDialog />
+      <RemoveAsceticismDialog />
     </>
   );
 }

@@ -42,6 +42,7 @@ import {
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 
 // Predefined categories with icons and colors
 const CATEGORIES = [
@@ -101,16 +102,12 @@ const TRACKING_TYPES = [
   },
 ];
 
-interface CreateAsceticismFormProps {
-  isAdmin?: boolean;
-  userId?: number;
-  disabled?: boolean;
-}
+export default function CreateAsceticismForm() {
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
 
-export default function CreateAsceticismForm({
-  userId,
-  disabled = false,
-}: CreateAsceticismFormProps) {
+  const disabled = !session || !userId;
+
   const { openSignInDialog } = useAsceticismStore();
   const queryClient = useQueryClient();
 

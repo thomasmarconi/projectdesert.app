@@ -26,6 +26,7 @@ import {
   useUserAsceticisms,
 } from "@/hooks/use-asceticisms";
 import { useSession } from "next-auth/react";
+import JoinAsceticismDialog from "@/components/asceticisms/dialogs/join-asceticism-dialog";
 
 export default function BrowseAsceticismTemplates() {
   const { data: session } = useSession();
@@ -254,6 +255,7 @@ export default function BrowseAsceticismTemplates() {
           </p>
         </div>
       )}
+      <JoinAsceticismDialog />
     </div>
   );
 }
