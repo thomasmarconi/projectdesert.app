@@ -42,9 +42,8 @@ export default function BrowseAsceticismTemplates() {
     true,
   );
 
-  console.log(userAsceticisms, templates);
-
   const { openJoinDialog, openRemoveDialog } = useAsceticismStore();
+
   // Create a map of asceticism ID to user asceticism for quick lookup
   // Prioritize non-archived asceticisms (there can be multiple UserAsceticism records per asceticismId)
   const joinedMap = new Map<number, UserAsceticism>();

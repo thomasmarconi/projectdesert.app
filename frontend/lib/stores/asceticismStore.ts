@@ -28,8 +28,6 @@ interface DialogState {
   // Viewing state
   viewingDate: Date;
   showArchived: boolean;
-
-  loading: boolean;
 }
 
 interface DialogActions {
@@ -64,8 +62,6 @@ interface DialogActions {
   // Viewing state actions
   setViewingDate: (date: Date) => void;
   setShowArchived: (show: boolean) => void;
-
-  setLoading: (value: boolean) => void;
 }
 
 type AsceticismStore = DialogState & DialogActions;
@@ -92,8 +88,6 @@ export const useAsceticismStore = create<AsceticismStore>((set) => ({
 
   viewingDate: new Date(),
   showArchived: true,
-
-  loading: true,
 
   // Actions
   openJoinDialog: (template) =>
@@ -163,6 +157,4 @@ export const useAsceticismStore = create<AsceticismStore>((set) => ({
 
   setViewingDate: (date) => set({ viewingDate: date }),
   setShowArchived: (show) => set({ showArchived: show }),
-
-  setLoading: (value) => set({ loading: value }),
 }));

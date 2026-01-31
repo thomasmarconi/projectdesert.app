@@ -42,14 +42,16 @@ import ViewNotesDialog from "@/components/asceticisms/dialogs/view-notes-dialog"
 import LogProgressDialog from "@/components/asceticisms/dialogs/log-progress-dialog";
 import RemoveAsceticismDialog from "@/components/asceticisms/dialogs/remove-asceticism-dialog";
 import { useSession } from "next-auth/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function MyCommitments({}) {
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
+  const [loading, setLoading] = useState<boolean>(true);
+
   // Zustand store
   const viewingDate = useAsceticismStore((state) => state.viewingDate);
-  const setLoading = useAsceticismStore((state) => state.setLoading);
   const openSignInDialog = useAsceticismStore(
     (state) => state.openSignInDialog,
   );
@@ -229,6 +231,19 @@ export default function MyCommitments({}) {
         <Button onClick={() => openSignInDialog()} size="lg" className="mt-2">
           Sign In to Get Started
         </Button>
+      </div>
+    );
+  }
+
+  if (loading && userId) {
+    return (
+      <div className="p-8 space-y-4">
+        <Skeleton className="h-12 w-48" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-64 w-full" />
+        </div>
       </div>
     );
   }

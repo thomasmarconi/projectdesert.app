@@ -1,9 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useAsceticismStore } from "@/lib/stores/asceticismStore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Sparkles, BarChart3 } from "lucide-react";
 import CreateAsceticismForm from "./tabs/create-asceticism-form";
 import ProgressDashboard from "./tabs/progress-dashboard";
@@ -12,25 +9,6 @@ import MyCommitments from "./tabs/my-commitments";
 import SignInPromptDialog from "./dialogs/sign-in-prompt-dialog";
 
 export default function AsceticismsPage() {
-  const { data: session } = useSession();
-  const userId = session?.user?.id;
-
-  // Zustand store
-  const loading = useAsceticismStore((state) => state.loading);
-
-  if (loading && userId) {
-    return (
-      <div className="p-8 space-y-4">
-        <Skeleton className="h-12 w-48" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Skeleton className="h-64 w-full" />
-          <Skeleton className="h-64 w-full" />
-          <Skeleton className="h-64 w-full" />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto px-4 py-8 md:px-8 md:py-10 max-w-7xl">
       <div className="flex flex-col gap-3 mb-10">
