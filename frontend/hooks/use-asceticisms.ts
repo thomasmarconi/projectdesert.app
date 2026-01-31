@@ -6,9 +6,9 @@ import {
   logProgress,
   leaveAsceticism,
   updateUserAsceticism,
-  AsceticismStatus,
 } from "@/lib/services/asceticismService";
 import { toast } from "sonner";
+import { AsceticismStatus } from "@/types/enums";
 
 // Query keys
 export const asceticismKeys = {
@@ -167,7 +167,13 @@ export function useUpdateUserAsceticism() {
       endDate?: string;
       targetValue?: number;
       status?: AsceticismStatus;
-    }) => updateUserAsceticism(userAsceticismId, { startDate, endDate, targetValue, status }),
+    }) =>
+      updateUserAsceticism(userAsceticismId, {
+        startDate,
+        endDate,
+        targetValue,
+        status,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [...asceticismKeys.all, "user"],
