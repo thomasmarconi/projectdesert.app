@@ -4,6 +4,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, Header, Depends
 from sqlmodel import Session, select, func
 from app.core.database import get_session
+from app.core.auth import get_user_by_email, require_admin
 from app.models import User, UserRole, UserAsceticism, GroupMember
 from app.schemas.admin import (
     UserResponse,
@@ -13,33 +14,6 @@ from app.schemas.admin import (
 )
 
 router = APIRouter(prefix="/admin", tags=["admin"])
-
-
-async def get_user_by_email(email: str, session: Session) -> Optional[User]:
-    """Get user by email."""
-    statement = select(User).where(User.email == email)
-    return session.exec(statement).first()
-
-
-async def require_admin(x_user_email: Optional[str], session: Session) -> User:
-    """Verify that the user is an admin."""
-    if not x_user_email:
-        raise HTTPException(status_code=401, detail="Unauthorized: Not logged in")
-
-    user = await get_user_by_email(x_user_email, session)
-
-    if not user:
-        raise HTTPException(status_code=401, detail="Unauthorized: User not found")
-
-    if user.isBanned:
-        raise HTTPException(status_code=403, detail="Unauthorized: User is banned")
-
-    if user.role != UserRole.ADMIN:
-        raise HTTPException(
-            status_code=403, detail="Unauthorized: Admin access required"
-        )
-
-    return user
 
 
 @router.get("/users", response_model=list[UserResponse])
