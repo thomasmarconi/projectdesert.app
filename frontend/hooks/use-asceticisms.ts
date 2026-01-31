@@ -5,8 +5,10 @@ import {
   joinAsceticismAction,
   logProgressAction,
   leaveAsceticismAction,
+  updateUserAsceticismAction,
 } from "@/lib/actions/asceticismActions";
 import { toast } from "sonner";
+import { AsceticismStatus } from "@/types/enums";
 
 // Query keys
 export const asceticismKeys = {
@@ -151,6 +153,43 @@ export function useLeaveAsceticism() {
     onError: (error) => {
       console.error("Error leaving asceticism:", error);
       toast.error("Failed to remove commitment.");
+    },
+  });
+}
+
+// Update user asceticism settings
+export function useUpdateUserAsceticism() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      userAsceticismId,
+      startDate,
+      endDate,
+      targetValue,
+      status,
+    }: {
+      userAsceticismId: number;
+      startDate?: string;
+      endDate?: string;
+      targetValue?: number;
+      status?: AsceticismStatus;
+    }) =>
+      updateUserAsceticismAction(userAsceticismId, {
+        startDate,
+        endDate,
+        targetValue,
+        status,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [...asceticismKeys.all, "user"],
+      });
+      toast.success("Settings updated!");
+    },
+    onError: (error) => {
+      console.error("Failed to update asceticism:", error);
+      toast.error("Failed to update settings.");
     },
   });
 }
