@@ -21,12 +21,14 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { auth } from "@/auth";
 import SidebarSignIn from "@/components/auth/sidebar-sign-in";
 import { SidebarSignOut } from "@/components/auth/sidebar-sign-out";
+import SidebarFeedbackButton from "@/components/sidebar/sidebar-feedback-button";
 
 // Menu items.
 const items = [
@@ -156,15 +158,20 @@ export default async function AppSidebar() {
                     <ChevronUp className="ml-auto size-4" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
+
                 <DropdownMenuContent
                   className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
                   side="top"
                   align="end"
                   sideOffset={4}
                 >
-                  <div className="p-1">
+                  {" "}
+                  <DropdownMenuItem>
+                    <SidebarFeedbackButton />
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
                     <SidebarSignOut />
-                  </div>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
