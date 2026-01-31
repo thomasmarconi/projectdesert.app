@@ -5,6 +5,8 @@ import {
   joinAsceticism,
   logProgress,
   leaveAsceticism,
+  updateUserAsceticism,
+  AsceticismStatus,
 } from "@/lib/services/asceticismService";
 import { toast } from "sonner";
 
@@ -144,6 +146,37 @@ export function useLeaveAsceticism() {
     onError: (error) => {
       console.error("Error leaving asceticism:", error);
       toast.error("Failed to remove commitment.");
+    },
+  });
+}
+
+// Update user asceticism settings
+export function useUpdateUserAsceticism() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      userAsceticismId,
+      startDate,
+      endDate,
+      targetValue,
+      status,
+    }: {
+      userAsceticismId: number;
+      startDate?: string;
+      endDate?: string;
+      targetValue?: number;
+      status?: AsceticismStatus;
+    }) => updateUserAsceticism(userAsceticismId, { startDate, endDate, targetValue, status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [...asceticismKeys.all, "user"],
+      });
+      toast.success("Settings updated!");
+    },
+    onError: (error) => {
+      console.error("Failed to update asceticism:", error);
+      toast.error("Failed to update settings.");
     },
   });
 }

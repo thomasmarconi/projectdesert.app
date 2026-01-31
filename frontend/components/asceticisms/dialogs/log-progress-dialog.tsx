@@ -1,7 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useAsceticismStore } from "@/lib/stores/asceticismStore";
-import { useLogProgress } from "@/hooks/use-asceticisms";
+import {
+  useLogProgress,
+  useUpdateUserAsceticism,
+} from "@/hooks/use-asceticisms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,8 +18,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { ChevronDown, Settings } from "lucide-react";
 
 export default function LogProgressDialog() {
   const {
@@ -30,6 +40,28 @@ export default function LogProgressDialog() {
   } = useAsceticismStore();
 
   const logMutation = useLogProgress();
+  const updateMutation = useUpdateUserAsceticism();
+
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  // Initialize dates when dialog opens
+  useEffect(() => {
+    if (loggingAsceticism) {
+      setStartDate(
+        loggingAsceticism.startDate
+          ? new Date(loggingAsceticism.startDate).toISOString().split("T")[0]
+          : "",
+      );
+      setEndDate(
+        loggingAsceticism.endDate
+          ? new Date(loggingAsceticism.endDate).toISOString().split("T")[0]
+          : "",
+      );
+      setSettingsOpen(false);
+    }
+  }, [loggingAsceticism]);
 
   async function handleConfirm() {
     if (!loggingAsceticism) return;
@@ -54,7 +86,33 @@ export default function LogProgressDialog() {
       logData.notes = logNotes.trim();
     }
 
+    // Check if dates changed
+    const originalStartDate = loggingAsceticism.startDate
+      ? new Date(loggingAsceticism.startDate).toISOString().split("T")[0]
+      : "";
+    const originalEndDate = loggingAsceticism.endDate
+      ? new Date(loggingAsceticism.endDate).toISOString().split("T")[0]
+      : "";
+
+    const datesChanged =
+      startDate !== originalStartDate || endDate !== originalEndDate;
+
+    // Validate dates
+    if (startDate && endDate && endDate < startDate) {
+      toast.error("End date cannot be before start date");
+      return;
+    }
+
     try {
+      // Update dates if changed
+      if (datesChanged) {
+        await updateMutation.mutateAsync({
+          userAsceticismId: loggingAsceticism.id,
+          startDate: startDate || undefined,
+          endDate: endDate || undefined,
+        });
+      }
+
       await logMutation.mutateAsync({
         userAsceticismId: loggingAsceticism.id,
         date,
@@ -125,6 +183,58 @@ export default function LogProgressDialog() {
               autoFocus={loggingAsceticism?.asceticism?.type === "TEXT"}
             />
           </div>
+
+          {/* Settings Section */}
+          <Collapsible open={settingsOpen} onOpenChange={setSettingsOpen}>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-full justify-between px-0 hover:bg-transparent"
+              >
+                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Settings className="h-4 w-4" />
+                  Date Settings
+                </span>
+                <ChevronDown
+                  className={`h-4 w-4 text-muted-foreground transition-transform ${settingsOpen ? "rotate-180" : ""}`}
+                />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 pt-2">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="start-date" className="text-sm font-medium">
+                    Start Date
+                  </Label>
+                  <Input
+                    id="start-date"
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => {
+                      const newStartDate = e.target.value;
+                      setStartDate(newStartDate);
+                      // Clear end date if it's now before start date
+                      if (endDate && endDate < newStartDate) {
+                        setEndDate("");
+                      }
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="end-date" className="text-sm font-medium">
+                    End Date
+                  </Label>
+                  <Input
+                    id="end-date"
+                    type="date"
+                    value={endDate}
+                    min={startDate || undefined}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
+                </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
         <DialogFooter className="gap-2">
           <Button
@@ -137,9 +247,11 @@ export default function LogProgressDialog() {
           <Button
             onClick={handleConfirm}
             className="h-10 px-6"
-            disabled={logMutation.isPending}
+            disabled={logMutation.isPending || updateMutation.isPending}
           >
-            {logMutation.isPending ? "Saving..." : "Save"}
+            {logMutation.isPending || updateMutation.isPending
+              ? "Saving..."
+              : "Save"}
           </Button>
         </DialogFooter>
       </DialogContent>

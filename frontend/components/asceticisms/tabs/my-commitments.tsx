@@ -22,7 +22,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
-  MessageSquare,
   X,
   Utensils,
   Heart,
@@ -64,7 +63,6 @@ export default function MyCommitments({
     setViewingDate,
     showArchived,
     setShowArchived,
-    openNotesDialog,
     openSignInDialog,
     openRemoveDialog,
   } = useAsceticismStore();
@@ -312,7 +310,6 @@ export default function MyCommitments({
           const logged = hasLoggedOnDate(ua);
           const logEntry = getLogForDate(ua);
           const type = ua.asceticism?.type || "BOOLEAN";
-          const hasNotes = logEntry?.notes;
 
           return (
             <div
@@ -336,12 +333,6 @@ export default function MyCommitments({
                   <h3 className="font-medium text-sm truncate">
                     {ua.asceticism?.title}
                   </h3>
-                  <Badge
-                    variant="outline"
-                    className="h-5 px-1.5 text-xs shrink-0"
-                  >
-                    {type}
-                  </Badge>
                 </div>
                 <p className="text-xs text-muted-foreground line-clamp-1">
                   {ua.asceticism?.description || "Daily practice."}
@@ -401,26 +392,6 @@ export default function MyCommitments({
                     <span className="text-xs">{logged ? "Edit" : "Log"}</span>
                   </Button>
                 )}
-
-                {/* View Notes Button (visible on hover or if has notes) */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    "h-8 w-8 text-muted-foreground hover:text-purple-600",
-                    hasNotes
-                      ? "opacity-100"
-                      : "opacity-0 group-hover:opacity-100",
-                  )}
-                  onClick={() => openNotesDialog(ua)}
-                  title="View/Edit notes"
-                >
-                  {hasNotes ? (
-                    <MessageSquare className="h-3.5 w-3.5 fill-current" />
-                  ) : (
-                    <MessageSquare className="h-3.5 w-3.5" />
-                  )}
-                </Button>
 
                 {/* Remove Button (visible on hover, only for active) */}
                 {ua.status !== "ARCHIVED" && (
