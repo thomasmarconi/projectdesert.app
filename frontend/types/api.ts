@@ -511,6 +511,16 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /**
+         * AddPackageToAccountRequest
+         * @description Request to add package to user account.
+         */
+        AddPackageToAccountRequest: {
+            /** Startdate */
+            startDate?: string | null;
+            /** Enddate */
+            endDate?: string | null;
+        };
+        /**
          * AsceticismCreate
          * @description Request to create an asceticism.
          */
@@ -1732,7 +1742,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddPackageToAccountRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

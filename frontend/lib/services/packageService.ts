@@ -33,6 +33,7 @@ export async function createPackage(
   });
 
   if (error) {
+    console.error("Package creation error:", error);
     throw new Error(getErrorMessage(error.detail, "Failed to create package"));
   }
 
@@ -154,6 +155,8 @@ export async function getPackageDetails(
 export async function addPackageToAccount(
   packageId: number,
   userEmail: string,
+  startDate?: Date,
+  endDate?: Date,
 ): Promise<{
   success: boolean;
   message: string;
@@ -170,6 +173,10 @@ export async function addPackageToAccount(
         path: {
           package_id: packageId,
         },
+      },
+      body: {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
       },
     },
   );

@@ -1,7 +1,7 @@
 """Packages router for managing asceticism packages."""
 
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Header, Depends
 from sqlmodel import Session, select
 from app.core.database import get_session
@@ -22,6 +22,7 @@ from app.schemas.packages import (
     AsceticismInfo,
     PackageItemResponse,
     PackageResponse,
+    AddPackageToAccountRequest,
 )
 
 router = APIRouter(prefix="/packages", tags=["packages"])
@@ -56,7 +57,7 @@ def format_package_response(
         description=package.description,
         creatorId=package.creatorId,
         isPublished=package.isPublished,
-        metadata=package.metadata,
+        custom_metadata=package.custom_metadata,
         createdAt=package.createdAt,
         updatedAt=package.updatedAt,
         items=formatted_items,
@@ -303,6 +304,7 @@ async def get_package_details(package_id: int, session: Session = Depends(get_se
 @router.post("/{package_id}/add-to-account")
 async def add_package_to_account(
     package_id: int,
+    request: AddPackageToAccountRequest,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
@@ -321,9 +323,13 @@ async def add_package_to_account(
     items_stmt = select(PackageItem).where(PackageItem.packageId == package_id)
     items = session.exec(items_stmt).all()
 
-    # Add each asceticism to the user's account
+    # Add each asceticism to the user's account or reactivate if archived
     added_count = 0
-    skipped_count = 0
+    reactivated_count = 0
+
+    # Use provided dates or defaults
+    start_date = request.startDate if request.startDate else datetime.now(timezone.utc)
+    end_date = request.endDate
 
     for item in items:
         # Check if user already has this asceticism
@@ -333,24 +339,38 @@ async def add_package_to_account(
         )
         existing = session.exec(existing_stmt).first()
 
-        if not existing:
+        if existing:
+            # If it exists, mark it as ACTIVE with the new dates
+            existing.status = AsceticismStatus.ACTIVE
+            existing.startDate = start_date
+            existing.endDate = end_date
+            existing.updatedAt = datetime.now(timezone.utc)
+            reactivated_count += 1
+        else:
             # Add the asceticism to user's account
             user_asceticism = UserAsceticism(
                 userId=current_user.id,
                 asceticismId=item.asceticismId,
                 status=AsceticismStatus.ACTIVE,
+                startDate=start_date,
+                endDate=end_date,
             )
             session.add(user_asceticism)
             added_count += 1
-        else:
-            skipped_count += 1
 
     session.commit()
 
+    total_activated = added_count + reactivated_count
+    message = f"Activated {total_activated} asceticism(s)"
+    if added_count > 0 and reactivated_count > 0:
+        message += f" ({added_count} new, {reactivated_count} reactivated)"
+    elif reactivated_count > 0:
+        message += " (all reactivated)"
+
     return {
         "success": True,
-        "message": f"Added {added_count} asceticism(s) to your account",
+        "message": message,
         "addedCount": added_count,
-        "skippedCount": skipped_count,
+        "skippedCount": 0,  # No longer skipping any
         "totalInPackage": len(items),
     }

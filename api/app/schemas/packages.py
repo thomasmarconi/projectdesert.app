@@ -56,6 +56,13 @@ class PackageItemResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class AddPackageToAccountRequest(BaseModel):
+    """Request to add package to user account."""
+
+    startDate: Optional[datetime] = None
+    endDate: Optional[datetime] = None
+
+
 class PackageResponse(BaseModel):
     """Package response."""
 

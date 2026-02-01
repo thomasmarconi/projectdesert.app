@@ -14,13 +14,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
 import {
   createPackageAction,
@@ -33,7 +26,10 @@ import {
 } from "@/lib/services/packageService";
 import { getAsceticismsAction } from "@/lib/actions/asceticismActions";
 import { Asceticism } from "@/lib/services/asceticismService";
-import { Plus, X } from "lucide-react";
+import { ChevronUp, ChevronDown, GripVertical } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 
 interface CreatePackageDialogProps {
   open: boolean;
@@ -57,9 +53,7 @@ export default function CreatePackageDialog({
   const [availableAsceticisms, setAvailableAsceticisms] = useState<
     Asceticism[]
   >([]);
-  const [selectedAsceticismId, setSelectedAsceticismId] = useState<
-    string | null
-  >(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -96,43 +90,52 @@ export default function CreatePackageDialog({
     setTitle("");
     setDescription("");
     setSelectedAsceticisms([]);
-    setSelectedAsceticismId(null);
+    setSearchQuery("");
   };
 
-  const handleAddAsceticism = () => {
-    if (!selectedAsceticismId) return;
-
-    const asceticismId = parseInt(selectedAsceticismId);
-
-    if (
-      selectedAsceticisms.some((item) => item.asceticismId === asceticismId)
-    ) {
-      toast.error("This asceticism is already in the package");
-      return;
-    }
-
-    setSelectedAsceticisms([
-      ...selectedAsceticisms,
-      {
-        asceticismId,
-        order: selectedAsceticisms.length,
-      },
-    ]);
-    setSelectedAsceticismId(null);
-  };
-
-  const handleRemoveAsceticism = (asceticismId: number) => {
-    setSelectedAsceticisms(
-      selectedAsceticisms.filter((item) => item.asceticismId !== asceticismId),
+  const isSelected = (asceticismId: number) => {
+    return selectedAsceticisms.some(
+      (item) => item.asceticismId === asceticismId,
     );
   };
 
-  const handleMoveUp = (index: number) => {
-    if (index === 0) return;
+  const getSelectedOrder = (asceticismId: number) => {
+    const index = selectedAsceticisms.findIndex(
+      (item) => item.asceticismId === asceticismId,
+    );
+    return index >= 0 ? index + 1 : null;
+  };
+
+  const handleToggleAsceticism = (asceticismId: number) => {
+    if (isSelected(asceticismId)) {
+      // Remove from selection
+      setSelectedAsceticisms(
+        selectedAsceticisms.filter(
+          (item) => item.asceticismId !== asceticismId,
+        ),
+      );
+    } else {
+      // Add to selection
+      setSelectedAsceticisms([
+        ...selectedAsceticisms,
+        {
+          asceticismId,
+          order: selectedAsceticisms.length,
+        },
+      ]);
+    }
+  };
+
+  const handleMoveUp = (asceticismId: number) => {
+    const currentIndex = selectedAsceticisms.findIndex(
+      (item) => item.asceticismId === asceticismId,
+    );
+    if (currentIndex <= 0) return;
+
     const newItems = [...selectedAsceticisms];
-    [newItems[index - 1], newItems[index]] = [
-      newItems[index],
-      newItems[index - 1],
+    [newItems[currentIndex - 1], newItems[currentIndex]] = [
+      newItems[currentIndex],
+      newItems[currentIndex - 1],
     ];
     newItems.forEach((item, idx) => {
       item.order = idx;
@@ -140,12 +143,17 @@ export default function CreatePackageDialog({
     setSelectedAsceticisms(newItems);
   };
 
-  const handleMoveDown = (index: number) => {
-    if (index === selectedAsceticisms.length - 1) return;
+  const handleMoveDown = (asceticismId: number) => {
+    const currentIndex = selectedAsceticisms.findIndex(
+      (item) => item.asceticismId === asceticismId,
+    );
+    if (currentIndex === -1 || currentIndex === selectedAsceticisms.length - 1)
+      return;
+
     const newItems = [...selectedAsceticisms];
-    [newItems[index], newItems[index + 1]] = [
-      newItems[index + 1],
-      newItems[index],
+    [newItems[currentIndex], newItems[currentIndex + 1]] = [
+      newItems[currentIndex + 1],
+      newItems[currentIndex],
     ];
     newItems.forEach((item, idx) => {
       item.order = idx;
@@ -194,13 +202,34 @@ export default function CreatePackageDialog({
     }
   };
 
-  const getAsceticismById = (id: number) => {
-    return availableAsceticisms.find((a) => a.id === id);
-  };
+  const filteredAsceticisms = availableAsceticisms.filter((asc) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      asc.title.toLowerCase().includes(query) ||
+      asc.category.toLowerCase().includes(query) ||
+      asc.description?.toLowerCase().includes(query)
+    );
+  });
+
+  // Sort: selected items first (by order), then unselected items
+  const sortedAsceticisms = [...filteredAsceticisms].sort((a, b) => {
+    const aSelected = isSelected(a.id);
+    const bSelected = isSelected(b.id);
+
+    if (aSelected && !bSelected) return -1;
+    if (!aSelected && bSelected) return 1;
+    if (aSelected && bSelected) {
+      const aOrder = getSelectedOrder(a.id) || 0;
+      const bOrder = getSelectedOrder(b.id) || 0;
+      return aOrder - bOrder;
+    }
+    return a.title.localeCompare(b.title);
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="min-w-4xl max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>
             {editingPackage ? "Edit Package" : "Create Package"}
@@ -210,7 +239,7 @@ export default function CreatePackageDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 flex-1 min-h-0 flex flex-col">
           <div>
             <Label htmlFor="title">Title *</Label>
             <Input
@@ -228,90 +257,108 @@ export default function CreatePackageDialog({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe what this package includes..."
-              rows={3}
+              rows={2}
             />
           </div>
 
-          <div>
-            <Label>Add Asceticisms *</Label>
-            <div className="flex gap-2 mt-2">
-              <Select
-                value={selectedAsceticismId || undefined}
-                onValueChange={setSelectedAsceticismId}
-              >
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Select an asceticism" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableAsceticisms.map((asc) => (
-                    <SelectItem key={asc.id} value={asc.id.toString()}>
-                      {asc.title} ({asc.category})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                type="button"
-                onClick={handleAddAsceticism}
-                disabled={!selectedAsceticismId}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+          <div className="flex-1 min-h-0 flex flex-col">
+            <div className="flex items-center justify-between mb-2">
+              <Label>
+                Select Asceticisms * ({selectedAsceticisms.length} selected)
+              </Label>
             </div>
-          </div>
 
-          {selectedAsceticisms.length > 0 && (
-            <div>
-              <Label>Selected Asceticisms ({selectedAsceticisms.length})</Label>
-              <div className="mt-2 space-y-2">
-                {selectedAsceticisms.map((item, index) => {
-                  const asc = getAsceticismById(item.asceticismId);
-                  return (
-                    <div
-                      key={item.asceticismId}
-                      className="flex items-center gap-2 p-2 border rounded"
-                    >
-                      <div className="flex flex-col gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleMoveUp(index)}
-                          disabled={index === 0}
-                          className="h-6 px-2"
-                        >
-                          ↑
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleMoveDown(index)}
-                          disabled={index === selectedAsceticisms.length - 1}
-                          className="h-6 px-2"
-                        >
-                          ↓
-                        </Button>
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-medium">{asc?.title}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {asc?.category}
+            <Input
+              placeholder="Search asceticisms..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="mb-2"
+            />
+
+            <div className="no-scrollbar -mx-4 max-h-[50vh] overflow-y-auto px-2">
+              <div className="p-2 space-y-1">
+                {sortedAsceticisms.length === 0 ? (
+                  <div className="text-center text-muted-foreground py-8">
+                    No asceticisms found
+                  </div>
+                ) : (
+                  sortedAsceticisms.map((asc) => {
+                    const selected = isSelected(asc.id);
+                    const order = getSelectedOrder(asc.id);
+
+                    return (
+                      <div
+                        key={asc.id}
+                        className={`flex items-center gap-3 p-3 rounded-md border transition-colors ${
+                          selected
+                            ? "bg-primary/5 border-primary/20"
+                            : "hover:bg-muted/50"
+                        }`}
+                      >
+                        <Checkbox
+                          checked={selected}
+                          onCheckedChange={() => handleToggleAsceticism(asc.id)}
+                          className="mt-1"
+                        />
+
+                        {selected && (
+                          <div className="flex flex-col gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => handleMoveUp(asc.id)}
+                              disabled={order === 1}
+                            >
+                              <ChevronUp className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => handleMoveDown(asc.id)}
+                              disabled={order === selectedAsceticisms.length}
+                            >
+                              <ChevronDown className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        )}
+
+                        {!selected && (
+                          <div className="w-6 flex items-center justify-center">
+                            <GripVertical className="h-4 w-4 text-muted-foreground/30" />
+                          </div>
+                        )}
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            {selected && (
+                              <Badge variant="secondary" className="text-xs">
+                                #{order}
+                              </Badge>
+                            )}
+                            <span className="font-medium truncate">
+                              {asc.title}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">
+                              {asc.category}
+                            </Badge>
+                            {asc.description && (
+                              <span className="text-xs text-muted-foreground truncate">
+                                {asc.description}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          handleRemoveAsceticism(item.asceticismId)
-                        }
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
             </div>
-          )}
+          </div>
         </div>
 
         <DialogFooter>
