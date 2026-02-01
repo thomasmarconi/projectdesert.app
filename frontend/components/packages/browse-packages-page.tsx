@@ -22,10 +22,10 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import {
-  browsePublishedPackages,
-  addPackageToAccount,
-  PackageResponse,
-} from "@/lib/services/packageService";
+  browsePublishedPackagesAction,
+  addPackageToAccountAction,
+} from "@/lib/actions/packageActions";
+import { PackageResponse } from "@/lib/services/packageService";
 import { Package, Plus, Check } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -45,7 +45,7 @@ export function BrowsePackagesPage() {
   const loadPackages = async () => {
     try {
       setLoading(true);
-      const data = await browsePublishedPackages();
+      const data = await browsePublishedPackagesAction();
       setPackages(data);
     } catch (error) {
       toast.error("Failed to load packages");
@@ -68,7 +68,10 @@ export function BrowsePackagesPage() {
 
     try {
       setAddingPackage(true);
-      const result = await addPackageToAccount(pkg.id, session.user.email);
+      const result = await addPackageToAccountAction(
+        pkg.id,
+        session.user.email,
+      );
 
       if (result.addedCount > 0) {
         toast.success(result.message, {

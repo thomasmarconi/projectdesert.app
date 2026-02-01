@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
-import { createAuthClient } from "@/lib/apiClient";
+import { getApiClient } from "@/lib/apiClient";
 import { UserRole } from "@/types/enums";
 import { revalidatePath } from "next/cache";
 import type { components } from "@/types/api";
@@ -16,7 +16,7 @@ export type UserData = components["schemas"]["UserResponse"];
  */
 async function getAuthClient() {
   const session = await auth();
-  return createAuthClient(session?.user?.email);
+  return getApiClient(session?.user?.email || undefined);
 }
 
 /**

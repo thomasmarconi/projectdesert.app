@@ -8,17 +8,19 @@ import json
 from fastapi import APIRouter, HTTPException, Depends
 from sqlmodel import Session, select
 from app.core.database import get_session
-from app.models import MassReading, DailyReadingNote
+from app.core.auth import get_current_user
+from app.models import MassReading, DailyReadingNote, User, UserRole
 from app.schemas.daily_readings import (
     DailyReadingNoteCreate,
     DailyReadingNoteUpdate,
     DailyReadingNoteResponse,
+    MassReadingResponse,
 )
 
 router = APIRouter(prefix="/daily-readings", tags=["daily-readings"])
 
 
-@router.get("/readings/{date}")
+@router.get("/readings/{date}", response_model=MassReadingResponse)
 async def get_mass_readings(date: str, session: Session = Depends(get_session)):
     """
     Get Mass readings for a specific date. Checks database cache first,
@@ -82,9 +84,16 @@ async def get_mass_readings(date: str, session: Session = Depends(get_session)):
 
 @router.post("/notes", response_model=DailyReadingNoteResponse)
 async def create_or_update_note(
-    data: DailyReadingNoteCreate, session: Session = Depends(get_session)
+    data: DailyReadingNoteCreate,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
 ):
     """Create or update a daily reading note for a user on a specific date."""
+    # Users can only create/update their own notes
+    if current_user.id != data.userId:
+        raise HTTPException(
+            status_code=403, detail="Cannot create note for another user"
+        )
     try:
         # Parse the date string and normalize to midnight UTC
         date_obj = datetime.fromisoformat(data.date.replace("Z", "+00:00"))
@@ -143,12 +152,18 @@ async def create_or_update_note(
 
 @router.get("/notes/{user_id}/{date}", response_model=DailyReadingNoteResponse)
 async def get_note_by_date(
-    user_id: int, date: str, session: Session = Depends(get_session)
+    user_id: int,
+    date: str,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
 ):
     """
     Get a user's daily reading note for a specific date.
     Returns 404 if no note exists for that date.
     """
+    # Users can only view their own notes unless they're admin
+    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Cannot view another user's notes")
     try:
         # Parse and normalize the date
         date_obj = datetime.fromisoformat(date.replace("Z", "+00:00"))
@@ -186,9 +201,13 @@ async def get_note_by_date(
 async def get_all_user_notes(
     user_id: int,
     limit: Optional[int] = 30,
+    current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     """Get all daily reading notes for a user, ordered by date descending."""
+    # Users can only view their own notes unless they're admin
+    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Cannot view another user's notes")
     try:
         statement = (
             select(DailyReadingNote)
@@ -215,13 +234,23 @@ async def get_all_user_notes(
 
 
 @router.delete("/notes/{note_id}")
-async def delete_note(note_id: int, session: Session = Depends(get_session)):
+async def delete_note(
+    note_id: int,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
     """Delete a daily reading note by ID."""
     try:
         note = session.get(DailyReadingNote, note_id)
 
         if not note:
             raise HTTPException(status_code=404, detail="Note not found")
+
+        # Users can only delete their own notes
+        if note.userId != current_user.id:
+            raise HTTPException(
+                status_code=403, detail="Cannot delete another user's note"
+            )
 
         session.delete(note)
         session.commit()

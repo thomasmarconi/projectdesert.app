@@ -35,16 +35,19 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import {
-  getAllPackagesAdmin,
-  createPackage,
-  updatePackage,
-  publishPackage,
-  deletePackage,
+  getAllPackagesAdminAction,
+  createPackageAction,
+  updatePackageAction,
+  publishPackageAction,
+  deletePackageAction,
+} from "@/lib/actions/packageActions";
+import {
   PackageResponse,
   PackageItemInput,
   PackageCreate,
 } from "@/lib/services/packageService";
-import { getAsceticisms, Asceticism } from "@/lib/services/asceticismService";
+import { getAsceticismsAction } from "@/lib/actions/asceticismActions";
+import { Asceticism } from "@/lib/services/asceticismService";
 import { Package, Plus, Edit, Trash2, Eye, EyeOff, X } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -84,7 +87,7 @@ export function PackagesManagementPage() {
 
     try {
       setLoading(true);
-      const data = await getAllPackagesAdmin(session.user.email);
+      const data = await getAllPackagesAdminAction(session.user.email);
       setPackages(data);
     } catch (error) {
       toast.error("Failed to load packages");
@@ -126,7 +129,7 @@ export function PackagesManagementPage() {
 
   const loadAsceticisms = async () => {
     try {
-      const data = await getAsceticisms();
+      const data = await getAsceticismsAction();
       setAvailableAsceticisms(data);
     } catch (error) {
       console.error("Failed to load asceticisms:", error);
@@ -236,10 +239,14 @@ export function PackagesManagementPage() {
       };
 
       if (editingPackage) {
-        await updatePackage(editingPackage.id, packageData, session.user.email);
+        await updatePackageAction(
+          editingPackage.id,
+          packageData,
+          session.user.email,
+        );
         toast.success("Package updated successfully");
       } else {
-        await createPackage(packageData, session.user.email);
+        await createPackageAction(packageData, session.user.email);
         toast.success("Package created successfully");
       }
 
@@ -258,7 +265,7 @@ export function PackagesManagementPage() {
     if (!session?.user?.email) return;
 
     try {
-      const result = await publishPackage(pkg.id, session.user.email);
+      const result = await publishPackageAction(pkg.id, session.user.email);
       toast.success(
         result.isPublished
           ? "Package published successfully"
@@ -279,7 +286,7 @@ export function PackagesManagementPage() {
     if (!session?.user?.email || !packageToDelete) return;
 
     try {
-      await deletePackage(packageToDelete, session.user.email);
+      await deletePackageAction(packageToDelete, session.user.email);
       toast.success("Package deleted successfully");
       setDeleteDialogOpen(false);
       setPackageToDelete(null);

@@ -1,16 +1,11 @@
-import { client } from "@/lib/apiClient";
+import { getApiClient } from "@/lib/apiClient";
 import type { components } from "@/types/api";
 
-// Export API response types from OpenAPI schema
+// Export all API types from OpenAPI schema - single source of truth
 export type DailyReadingNote =
   components["schemas"]["DailyReadingNoteResponse"];
-
-// Types for Mass readings
-export interface ReadingText {
-  text: string;
-  source?: string;
-  heading?: string;
-}
+export type ReadingText = components["schemas"]["ReadingText"];
+export type MassReading = components["schemas"]["MassReadingResponse"];
 
 // Helper to extract error message from API response
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,26 +19,13 @@ function getErrorMessage(detail: any, defaultMsg: string): string {
   return defaultMsg;
 }
 
-export interface MassReading {
-  Mass_G?: ReadingText; // Gospel
-  Mass_R1?: ReadingText; // First Reading
-  Mass_R2?: ReadingText; // Second Reading
-  Mass_Ps?: ReadingText; // Responsorial Psalm
-  Mass_GA?: ReadingText; // Gospel Acclamation
-  copyright?: ReadingText; // Copyright/Attribution
-  day?: string;
-  date?: string;
-  number?: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
-}
-
 /**
  * Fetch Mass readings from our backend API for a specific date
  * @param date - Date in YYYYMMDD format
  * @returns MassReading object
  */
 export async function getMassReadings(date: string): Promise<MassReading> {
+  const client = await getApiClient();
   const { data, error } = await client.GET("/daily-readings/readings/{date}", {
     params: {
       path: {
@@ -57,7 +39,7 @@ export async function getMassReadings(date: string): Promise<MassReading> {
     throw new Error("Failed to fetch Mass readings");
   }
 
-  return data as unknown as MassReading;
+  return data!;
 }
 
 /**
@@ -103,6 +85,7 @@ export async function saveReadingNote(
   date: string,
   notes: string,
 ): Promise<DailyReadingNote> {
+  const client = await getApiClient();
   const { data, error } = await client.POST("/daily-readings/notes", {
     body: {
       userId,
@@ -125,6 +108,7 @@ export async function getReadingNote(
   userId: number,
   date: string,
 ): Promise<DailyReadingNote | null> {
+  const client = await getApiClient();
   const { data, error, response } = await client.GET(
     "/daily-readings/notes/{user_id}/{date}",
     {
@@ -155,6 +139,7 @@ export async function getAllUserNotes(
   userId: number,
   limit: number = 30,
 ): Promise<DailyReadingNote[]> {
+  const client = await getApiClient();
   const { data, error } = await client.GET("/daily-readings/notes/{user_id}", {
     params: {
       path: {
@@ -177,6 +162,7 @@ export async function getAllUserNotes(
  * Delete a daily reading note
  */
 export async function deleteReadingNote(noteId: number): Promise<void> {
+  const client = await getApiClient();
   const { error } = await client.DELETE("/daily-readings/notes/{note_id}", {
     params: {
       path: {

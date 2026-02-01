@@ -22,11 +22,13 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import {
-  getMassReadings,
+  getMassReadingsAction,
+  saveReadingNoteAction,
+  getReadingNoteAction,
+} from "@/lib/actions/dailyReadingsActions";
+import {
   formatDateForAPI,
   formatDateISO,
-  saveReadingNote,
-  getReadingNote,
   type MassReading,
   type DailyReadingNote,
 } from "@/lib/services/dailyReadingsService";
@@ -71,13 +73,13 @@ export default function DailyReadingsPage() {
       try {
         // Fetch Mass readings (available to all users)
         const dateString = formatDateForAPI(selectedDate);
-        const readingsData = await getMassReadings(dateString);
+        const readingsData = await getMassReadingsAction(dateString);
         setReadings(readingsData);
 
         // Fetch existing note for this date (only for authenticated users)
         if (userId) {
           const isoDate = formatDateISO(selectedDate);
-          const existingNote = await getReadingNote(userId, isoDate);
+          const existingNote = await getReadingNoteAction(userId, isoDate);
           setSavedNote(existingNote);
           setNotes(existingNote?.notes || "");
         }
@@ -109,7 +111,7 @@ export default function DailyReadingsPage() {
 
     try {
       const isoDate = formatDateISO(selectedDate);
-      const savedData = await saveReadingNote(userId, isoDate, notes);
+      const savedData = await saveReadingNoteAction(userId, isoDate, notes);
       setSavedNote(savedData);
       setSaveSuccess(true);
 

@@ -57,20 +57,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+  session: {
+    strategy: "jwt", // Use JWT strategy for tokens
+  },
   callbacks: {
-    session({ session, token, user }) {
+    async jwt({ token, user }) {
+      // Add user info to token on sign in
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+        token.isBanned = user.isBanned;
+      }
+      return token;
+    },
+    session({ session, token }) {
       // `session.user.id` is now a valid property, and will be type-checked
       // in places like `useSession().data.user` or `auth().user`
       return {
         ...session,
         user: {
           ...session.user,
-          id: user.id,
-          role: user.role,
-          isBanned: user.isBanned,
+          id: token.id as number,
+          role: token.role as string,
+          isBanned: token.isBanned as boolean,
         },
-        token,
-      };
+      } as typeof session;
     },
   },
 });

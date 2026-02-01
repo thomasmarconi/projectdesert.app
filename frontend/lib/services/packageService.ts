@@ -1,4 +1,4 @@
-import { createAuthClient, client } from "@/lib/apiClient";
+import { getApiClient } from "@/lib/apiClient";
 import type { components } from "@/types/api";
 
 // Export API response types from OpenAPI schema
@@ -26,9 +26,9 @@ export async function createPackage(
   packageData: PackageCreate,
   userEmail: string,
 ): Promise<PackageResponse> {
-  const authClient = createAuthClient(userEmail);
+  const client = await getApiClient(userEmail);
 
-  const { data, error } = await authClient.POST("/packages/", {
+  const { data, error } = await client.POST("/packages/", {
     body: packageData,
   });
 
@@ -42,9 +42,9 @@ export async function createPackage(
 export async function getAllPackagesAdmin(
   userEmail: string,
 ): Promise<PackageResponse[]> {
-  const authClient = createAuthClient(userEmail);
+  const client = await getApiClient(userEmail);
 
-  const { data, error } = await authClient.GET("/packages/admin/all");
+  const { data, error } = await client.GET("/packages/admin/all");
 
   if (error) {
     throw new Error(getErrorMessage(error.detail, "Failed to fetch packages"));
@@ -58,9 +58,9 @@ export async function updatePackage(
   packageData: PackageUpdate,
   userEmail: string,
 ): Promise<PackageResponse> {
-  const authClient = createAuthClient(userEmail);
+  const client = await getApiClient(userEmail);
 
-  const { data, error } = await authClient.PUT("/packages/{package_id}", {
+  const { data, error } = await client.PUT("/packages/{package_id}", {
     params: {
       path: {
         package_id: packageId,
@@ -80,18 +80,15 @@ export async function publishPackage(
   packageId: number,
   userEmail: string,
 ): Promise<PackageResponse> {
-  const authClient = createAuthClient(userEmail);
+  const client = await getApiClient(userEmail);
 
-  const { data, error } = await authClient.POST(
-    "/packages/{package_id}/publish",
-    {
-      params: {
-        path: {
-          package_id: packageId,
-        },
+  const { data, error } = await client.POST("/packages/{package_id}/publish", {
+    params: {
+      path: {
+        package_id: packageId,
       },
     },
-  );
+  });
 
   if (error) {
     throw new Error(getErrorMessage(error.detail, "Failed to publish package"));
@@ -104,9 +101,9 @@ export async function deletePackage(
   packageId: number,
   userEmail: string,
 ): Promise<{ success: boolean }> {
-  const authClient = createAuthClient(userEmail);
+  const client = await getApiClient(userEmail);
 
-  const { error } = await authClient.DELETE("/packages/{package_id}", {
+  const { error } = await client.DELETE("/packages/{package_id}", {
     params: {
       path: {
         package_id: packageId,
@@ -123,6 +120,7 @@ export async function deletePackage(
 
 // User functions
 export async function browsePublishedPackages(): Promise<PackageResponse[]> {
+  const client = await getApiClient();
   const { data, error } = await client.GET("/packages/browse");
 
   if (error) {
@@ -135,6 +133,7 @@ export async function browsePublishedPackages(): Promise<PackageResponse[]> {
 export async function getPackageDetails(
   packageId: number,
 ): Promise<PackageResponse> {
+  const client = await getApiClient();
   const { data, error } = await client.GET("/packages/{package_id}", {
     params: {
       path: {
@@ -162,9 +161,9 @@ export async function addPackageToAccount(
   skippedCount: number;
   totalInPackage: number;
 }> {
-  const authClient = createAuthClient(userEmail);
+  const client = await getApiClient(userEmail);
 
-  const { data, error } = await authClient.POST(
+  const { data, error } = await client.POST(
     "/packages/{package_id}/add-to-account",
     {
       params: {

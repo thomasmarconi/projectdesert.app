@@ -35,7 +35,7 @@ setup-backend:
 
 setup: setup-frontend setup-backend
 
-# TypeScript Types Generation
+# TypeScript Types Generation -- Backend needs to be running on port 8000
 generate-types:
 	cd frontend && npm run generate:types
 

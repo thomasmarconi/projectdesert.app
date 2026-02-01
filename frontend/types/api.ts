@@ -19,7 +19,7 @@ export interface paths {
         put?: never;
         /**
          * Create Asceticism
-         * @description Create a new asceticism.
+         * @description Create a new asceticism. Requires admin for templates, auth for custom.
          */
         post: operations["create_asceticism_asceticisms__post"];
         delete?: never;
@@ -38,13 +38,13 @@ export interface paths {
         get?: never;
         /**
          * Update Asceticism
-         * @description Update an existing asceticism template.
+         * @description Update an existing asceticism template. Admin only.
          */
         put: operations["update_asceticism_asceticisms__asceticism_id__put"];
         post?: never;
         /**
          * Delete Asceticism
-         * @description Delete an asceticism template.
+         * @description Delete an asceticism template. Admin only.
          */
         delete: operations["delete_asceticism_asceticisms__asceticism_id__delete"];
         options?: never;
@@ -172,26 +172,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/debug/user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Create Debug User
-         * @description Create a debug user for testing purposes.
-         */
-        post: operations["create_debug_user_debug_user_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/admin/users": {
         parameters: {
             query?: never;
@@ -263,10 +243,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get Current User
+         * Get Current User Info
          * @description Get current user info including role and ban status.
          */
-        get: operations["get_current_user_admin_current_user_get"];
+        get: operations["get_current_user_info_admin_current_user_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -571,6 +551,20 @@ export interface components {
             type: string;
         };
         /**
+         * AsceticismProgressResponse
+         * @description Progress response with statistics and logs.
+         */
+        AsceticismProgressResponse: {
+            /** Userasceticismid */
+            userAsceticismId: number;
+            asceticism: components["schemas"]["AsceticismSummary"];
+            /** Startdate */
+            startDate: string;
+            stats: components["schemas"]["ProgressStats"];
+            /** Logs */
+            logs: components["schemas"]["ProgressLog"][];
+        };
+        /**
          * AsceticismResponse
          * @description Asceticism response.
          */
@@ -611,6 +605,22 @@ export interface components {
          * @enum {string}
          */
         AsceticismStatus: "ACTIVE" | "PAUSED" | "COMPLETED" | "ARCHIVED";
+        /**
+         * AsceticismSummary
+         * @description Minimal asceticism data for progress responses.
+         */
+        AsceticismSummary: {
+            /** Id */
+            id: number;
+            /** Title */
+            title: string;
+            /** Category */
+            category: string;
+            /** Icon */
+            icon: string | null;
+            /** Type */
+            type: string;
+        };
         /**
          * CurrentUserResponse
          * @description Current user information.
@@ -721,6 +731,26 @@ export interface components {
             updatedAt: string;
         };
         /**
+         * MassReadingResponse
+         * @description Mass readings response from Universalis API.
+         */
+        MassReadingResponse: {
+            Mass_G?: components["schemas"]["ReadingText"] | null;
+            Mass_R1?: components["schemas"]["ReadingText"] | null;
+            Mass_R2?: components["schemas"]["ReadingText"] | null;
+            Mass_Ps?: components["schemas"]["ReadingText"] | null;
+            Mass_GA?: components["schemas"]["ReadingText"] | null;
+            copyright?: components["schemas"]["ReadingText"] | null;
+            /** Day */
+            day?: string | null;
+            /** Date */
+            date?: string | null;
+            /** Number */
+            number?: number | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
          * PackageCreate
          * @description Request to create a package.
          */
@@ -817,6 +847,48 @@ export interface components {
             items?: components["schemas"]["PackageItemInput"][] | null;
         };
         /**
+         * ProgressLog
+         * @description Progress log data for statistics.
+         */
+        ProgressLog: {
+            /** Date */
+            date: string;
+            /** Completed */
+            completed: boolean;
+            /** Value */
+            value: number | null;
+            /** Notes */
+            notes: string | null;
+        };
+        /**
+         * ProgressStats
+         * @description Progress statistics.
+         */
+        ProgressStats: {
+            /** Totaldays */
+            totalDays: number;
+            /** Completeddays */
+            completedDays: number;
+            /** Completionrate */
+            completionRate: number;
+            /** Currentstreak */
+            currentStreak: number;
+            /** Longeststreak */
+            longestStreak: number;
+        };
+        /**
+         * ReadingText
+         * @description Text content of a liturgical reading.
+         */
+        ReadingText: {
+            /** Text */
+            text: string;
+            /** Source */
+            source?: string | null;
+            /** Heading */
+            heading?: string | null;
+        };
+        /**
          * ToggleBanRequest
          * @description Request to ban or unban a user.
          */
@@ -847,16 +919,16 @@ export interface components {
          * @description Request to link user to asceticism.
          */
         UserAsceticismLink: {
+            /** Startdate */
+            startDate?: string | null;
+            /** Enddate */
+            endDate?: string | null;
             /** Userid */
             userId: number;
             /** Asceticismid */
             asceticismId: number;
             /** Targetvalue */
             targetValue?: number | null;
-            /** Startdate */
-            startDate?: string | null;
-            /** Enddate */
-            endDate?: string | null;
             /** Custom Metadata */
             custom_metadata?: {
                 [key: string]: unknown;
@@ -874,6 +946,39 @@ export interface components {
             /** Targetvalue */
             targetValue?: number | null;
             status?: components["schemas"]["AsceticismStatus"] | null;
+        };
+        /**
+         * UserAsceticismWithDetails
+         * @description User asceticism response with nested asceticism and logs.
+         */
+        UserAsceticismWithDetails: {
+            /** Id */
+            id: number;
+            /** Userid */
+            userId: number;
+            /** Asceticismid */
+            asceticismId: number;
+            /** Status */
+            status: string;
+            /** Startdate */
+            startDate: string;
+            /** Enddate */
+            endDate: string | null;
+            /** Targetvalue */
+            targetValue: number | null;
+            /** Remindertime */
+            reminderTime: string | null;
+            /** Custom Metadata */
+            custom_metadata: {
+                [key: string]: unknown;
+            } | null;
+            /** Createdat */
+            createdAt: string;
+            /** Updatedat */
+            updatedAt: string;
+            asceticism: components["schemas"]["AsceticismResponse"];
+            /** Logs */
+            logs: components["schemas"]["LogResponse"][];
         };
         /**
          * UserResponse
@@ -951,7 +1056,9 @@ export interface operations {
     create_asceticism_asceticisms__post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -984,7 +1091,9 @@ export interface operations {
     update_asceticism_asceticisms__asceticism_id__put: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 asceticism_id: number;
             };
@@ -1019,7 +1128,9 @@ export interface operations {
     delete_asceticism_asceticisms__asceticism_id__delete: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 asceticism_id: number;
             };
@@ -1055,7 +1166,9 @@ export interface operations {
                 endDate?: string | null;
                 includeArchived?: boolean;
             };
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1067,7 +1180,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["UserAsceticismWithDetails"][];
                 };
             };
             /** @description Validation Error */
@@ -1084,7 +1197,9 @@ export interface operations {
     join_asceticism_asceticisms_join_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1100,7 +1215,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["UserAsceticismWithDetails"];
                 };
             };
             /** @description Validation Error */
@@ -1117,7 +1232,9 @@ export interface operations {
     log_daily_progress_asceticisms_log_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1150,7 +1267,9 @@ export interface operations {
     leave_asceticism_asceticisms_leave__user_asceticism_id__delete: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 user_asceticism_id: number;
             };
@@ -1181,7 +1300,9 @@ export interface operations {
     update_user_asceticism_asceticisms_my__user_asceticism_id__patch: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 user_asceticism_id: number;
             };
@@ -1199,7 +1320,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["UserAsceticismWithDetails"];
                 };
             };
             /** @description Validation Error */
@@ -1220,7 +1341,9 @@ export interface operations {
                 startDate: string;
                 endDate: string;
             };
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1232,38 +1355,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_debug_user_debug_user_post: {
-        parameters: {
-            query: {
-                email: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["AsceticismProgressResponse"][];
                 };
             };
             /** @description Validation Error */
@@ -1281,7 +1373,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                "x-user-email"?: string | null;
+                authorization?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -1312,7 +1404,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                "x-user-email"?: string | null;
+                authorization?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -1347,7 +1439,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                "x-user-email"?: string | null;
+                authorization?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -1378,11 +1470,11 @@ export interface operations {
             };
         };
     };
-    get_current_user_admin_current_user_get: {
+    get_current_user_info_admin_current_user_get: {
         parameters: {
             query?: never;
             header?: {
-                "x-user-email"?: string | null;
+                authorization?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -1413,7 +1505,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                "x-user-email"?: string | null;
+                authorization?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -1448,7 +1540,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                "x-user-email"?: string | null;
+                authorization?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -1510,7 +1602,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                "x-user-email"?: string | null;
+                authorization?: string | null;
             };
             path: {
                 package_id: number;
@@ -1547,7 +1639,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                "x-user-email"?: string | null;
+                authorization?: string | null;
             };
             path: {
                 package_id: number;
@@ -1580,7 +1672,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                "x-user-email"?: string | null;
+                authorization?: string | null;
             };
             path: {
                 package_id: number;
@@ -1633,7 +1725,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                "x-user-email"?: string | null;
+                authorization?: string | null;
             };
             path: {
                 package_id: number;
@@ -1679,7 +1771,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["MassReadingResponse"];
                 };
             };
             /** @description Validation Error */
@@ -1696,7 +1788,9 @@ export interface operations {
     create_or_update_note_daily_readings_notes_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1729,7 +1823,9 @@ export interface operations {
     get_note_by_date_daily_readings_notes__user_id___date__get: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 user_id: number;
                 date: string;
@@ -1763,7 +1859,9 @@ export interface operations {
             query?: {
                 limit?: number | null;
             };
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 user_id: number;
             };
@@ -1794,7 +1892,9 @@ export interface operations {
     delete_note_daily_readings_notes__note_id__delete: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 note_id: number;
             };

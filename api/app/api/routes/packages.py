@@ -5,7 +5,7 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException, Header, Depends
 from sqlmodel import Session, select
 from app.core.database import get_session
-from app.core.auth import require_admin, require_authenticated_user
+from app.core.auth import require_admin, get_current_user
 from app.models import (
     AsceticismPackage,
     PackageItem,
@@ -67,17 +67,16 @@ def format_package_response(
 @router.post("/", response_model=PackageResponse)
 async def create_package(
     package_data: PackageCreate,
-    x_user_email: Optional[str] = Header(None),
     session: Session = Depends(get_session),
+    current_user: User = Depends(require_admin),
 ):
     """Create a new asceticism package (admin only)."""
-    user = await require_admin(x_user_email, session)
 
     # Create the package
     package = AsceticismPackage(
         title=package_data.title,
         description=package_data.description,
-        creatorId=user.id,
+        creatorId=current_user.id,
         isPublished=False,
         custom_metadata=package_data.custom_metadata,
     )
@@ -115,11 +114,10 @@ async def create_package(
 
 @router.get("/admin/all", response_model=list[PackageResponse])
 async def get_all_packages_admin(
-    x_user_email: Optional[str] = Header(None),
     session: Session = Depends(get_session),
+    current_user: User = Depends(require_admin),
 ):
     """Get all packages including unpublished ones (admin only)."""
-    await require_admin(x_user_email, session)
 
     statement = select(AsceticismPackage).order_by(AsceticismPackage.createdAt.desc())
     packages = session.exec(statement).all()
@@ -144,11 +142,10 @@ async def get_all_packages_admin(
 async def update_package(
     package_id: int,
     package_data: PackageUpdate,
-    x_user_email: Optional[str] = Header(None),
     session: Session = Depends(get_session),
+    current_user: User = Depends(require_admin),
 ):
     """Update a package (admin only)."""
-    await require_admin(x_user_email, session)
 
     # Check if package exists
     package = session.get(AsceticismPackage, package_id)
@@ -210,11 +207,10 @@ async def update_package(
 @router.post("/{package_id}/publish")
 async def publish_package(
     package_id: int,
-    x_user_email: Optional[str] = Header(None),
     session: Session = Depends(get_session),
+    current_user: User = Depends(require_admin),
 ):
     """Publish or unpublish a package (admin only)."""
-    await require_admin(x_user_email, session)
 
     package = session.get(AsceticismPackage, package_id)
     if not package:
@@ -233,11 +229,10 @@ async def publish_package(
 @router.delete("/{package_id}")
 async def delete_package(
     package_id: int,
-    x_user_email: Optional[str] = Header(None),
     session: Session = Depends(get_session),
+    current_user: User = Depends(require_admin),
 ):
     """Delete a package (admin only)."""
-    await require_admin(x_user_email, session)
 
     package = session.get(AsceticismPackage, package_id)
     if not package:
@@ -308,11 +303,10 @@ async def get_package_details(package_id: int, session: Session = Depends(get_se
 @router.post("/{package_id}/add-to-account")
 async def add_package_to_account(
     package_id: int,
-    x_user_email: Optional[str] = Header(None),
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     """Add all asceticisms from a package to the user's account."""
-    user = await require_authenticated_user(x_user_email, session)
 
     # Get the package
     package = session.get(AsceticismPackage, package_id)
@@ -334,7 +328,7 @@ async def add_package_to_account(
     for item in items:
         # Check if user already has this asceticism
         existing_stmt = select(UserAsceticism).where(
-            UserAsceticism.userId == user.id,
+            UserAsceticism.userId == current_user.id,
             UserAsceticism.asceticismId == item.asceticismId,
         )
         existing = session.exec(existing_stmt).first()
@@ -342,7 +336,7 @@ async def add_package_to_account(
         if not existing:
             # Add the asceticism to user's account
             user_asceticism = UserAsceticism(
-                userId=user.id,
+                userId=current_user.id,
                 asceticismId=item.asceticismId,
                 status=AsceticismStatus.ACTIVE,
             )

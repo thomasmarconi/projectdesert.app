@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAsceticismStore } from "@/lib/stores/asceticismStore";
-import { useLogProgress } from "@/hooks/use-asceticisms";
+import { useLogProgress, useUserAsceticisms } from "@/hooks/use-asceticisms";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -37,37 +37,66 @@ import {
   FileText,
 } from "lucide-react";
 import { UserAsceticism } from "@/lib/services/asceticismService";
-import type { Session } from "next-auth";
+import ViewNotesDialog from "@/components/asceticisms/dialogs/view-notes-dialog";
+import LogProgressDialog from "@/components/asceticisms/dialogs/log-progress-dialog";
+import RemoveAsceticismDialog from "@/components/asceticisms/dialogs/remove-asceticism-dialog";
+import { useSession } from "next-auth/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface MyCommitmentsProps {
-  session: Session | null;
-  userId?: string;
-  myAsceticisms: UserAsceticism[];
-  handleLogClick: (ua: UserAsceticism) => void;
-  getLogForDate: (
-    ua: UserAsceticism,
-  ) => NonNullable<UserAsceticism["logs"]>[number] | undefined;
-}
+export default function MyCommitments({}) {
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
 
-export default function MyCommitments({
-  session,
-  userId,
-  myAsceticisms,
-  handleLogClick,
-  getLogForDate,
-}: MyCommitmentsProps) {
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Zustand store
+  const viewingDate = useAsceticismStore((state) => state.viewingDate);
+  const openSignInDialog = useAsceticismStore(
+    (state) => state.openSignInDialog,
+  );
+  const setViewingDate = useAsceticismStore((state) => state.setViewingDate);
+  const showArchived = useAsceticismStore((state) => state.showArchived);
+  const setShowArchived = useAsceticismStore((state) => state.setShowArchived);
+  const openNotesDialog = useAsceticismStore((state) => state.openNotesDialog);
+  const openRemoveDialog = useAsceticismStore(
+    (state) => state.openRemoveDialog,
+  );
+  const openLogDialog = useAsceticismStore((state) => state.openLogDialog);
+
+  // TanStack Query hooks
+  const dateStr = viewingDate.toISOString().split("T")[0];
+
+  const { data: myAsceticisms = [], isLoading: myAsceticismsLoading } =
+    useUserAsceticisms(userId, dateStr, dateStr, showArchived);
+
   const [completingAll, setCompletingAll] = useState(false);
 
-  const {
-    viewingDate,
-    setViewingDate,
-    showArchived,
-    setShowArchived,
-    openSignInDialog,
-    openRemoveDialog,
-  } = useAsceticismStore();
-
   const logMutation = useLogProgress();
+
+  // Update loading state when query status changes
+  useEffect(() => {
+    setLoading(userId !== null && myAsceticismsLoading);
+  }, [userId, myAsceticismsLoading]);
+
+  // === Log Handlers ===
+  function handleLogClick(ua: UserAsceticism) {
+    const existingLog = getLogForDate(ua);
+    openLogDialog(
+      ua,
+      existingLog?.value?.toString() || "",
+      existingLog?.notes || "",
+    );
+  }
+
+  // === Helper Functions ===
+  function getLogForDate(ua: UserAsceticism) {
+    const dateStr = viewingDate.toISOString().split("T")[0];
+    const logs = ua.logs || [];
+    return logs.find((log) => {
+      const logDate = new Date(log.date).toISOString().split("T")[0];
+      return logDate === dateStr;
+    });
+  }
 
   function hasLoggedOnDate(ua: UserAsceticism): boolean {
     const dateStr = viewingDate.toISOString().split("T")[0];
@@ -201,6 +230,19 @@ export default function MyCommitments({
         <Button onClick={() => openSignInDialog()} size="lg" className="mt-2">
           Sign In to Get Started
         </Button>
+      </div>
+    );
+  }
+
+  if (loading && userId) {
+    return (
+      <div className="p-8 space-y-4">
+        <Skeleton className="h-12 w-48" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-64 w-full" />
+        </div>
       </div>
     );
   }
@@ -429,6 +471,9 @@ export default function MyCommitments({
           </div>
         )}
       </div>
+      <ViewNotesDialog getLogForDate={getLogForDate} onEdit={handleLogClick} />
+      <LogProgressDialog />
+      <RemoveAsceticismDialog />
     </>
   );
 }

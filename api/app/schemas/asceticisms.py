@@ -130,3 +130,60 @@ class LogResponse(BaseModel):
     updatedAt: datetime
 
     model_config = {"from_attributes": True}
+
+
+class UserAsceticismWithDetails(BaseModel):
+    """User asceticism response with nested asceticism and logs."""
+
+    id: int
+    userId: int
+    asceticismId: int
+    status: str
+    startDate: str
+    endDate: Optional[str]
+    targetValue: Optional[float]
+    reminderTime: Optional[str]
+    custom_metadata: Optional[dict]
+    createdAt: str
+    updatedAt: str
+    asceticism: AsceticismResponse
+    logs: list[LogResponse]
+
+
+class ProgressLog(BaseModel):
+    """Progress log data for statistics."""
+
+    date: str
+    completed: bool
+    value: Optional[float]
+    notes: Optional[str]
+
+
+class ProgressStats(BaseModel):
+    """Progress statistics."""
+
+    totalDays: int
+    completedDays: int
+    completionRate: float
+    currentStreak: int
+    longestStreak: int
+
+
+class AsceticismSummary(BaseModel):
+    """Minimal asceticism data for progress responses."""
+
+    id: int
+    title: str
+    category: str
+    icon: Optional[str]
+    type: str
+
+
+class AsceticismProgressResponse(BaseModel):
+    """Progress response with statistics and logs."""
+
+    userAsceticismId: int
+    asceticism: AsceticismSummary
+    startDate: str
+    stats: ProgressStats
+    logs: list[ProgressLog]

@@ -55,15 +55,16 @@ These instructions must be followed for all contributions to this repository.
 - Components may only call functions exposed by service modules.
 - If no appropriate service file exists, create one following existing naming conventions.
 
-## Prisma Schema Management
+## DB Schema Management
 
-- Any database schema change must be made in the Prisma schema files.
-- When modifying the database schema, update:
-  - `backend/prisma/schema.prisma`
-  - `frontend/prisma/schema.prisma`
-- Do not modify only one schema file.
-- Assume both schemas must remain structurally identical.
-- Do not manually redefine database types in code that are derived from Prisma models.
+- Any database schema change must be made in the api/app/models/**init.py** file.
+
+## Data Model Management
+
+- There should be one source of truth for the data models.
+- The source of truth is /api/app/schemas
+- These schema files defile what models the api accepts and returns
+- The frontend will generate these models via openapi-typescript http://localhost:8000/openapi.json -o types/api.ts
 
 ## Backend API Validation
 

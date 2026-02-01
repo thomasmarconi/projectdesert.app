@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  getAsceticisms,
-  getUserAsceticisms,
-  joinAsceticism,
-  logProgress,
-  leaveAsceticism,
-  updateUserAsceticism,
-} from "@/lib/services/asceticismService";
+  getAsceticismsAction,
+  getUserAsceticismsAction,
+  joinAsceticismAction,
+  logProgressAction,
+  leaveAsceticismAction,
+  updateUserAsceticismAction,
+} from "@/lib/actions/asceticismActions";
 import { toast } from "sonner";
 import { AsceticismStatus } from "@/types/enums";
 
@@ -34,7 +34,7 @@ export const asceticismKeys = {
 export function useAsceticismTemplates() {
   return useQuery({
     queryKey: asceticismKeys.templates(),
-    queryFn: () => getAsceticisms(),
+    queryFn: () => getAsceticismsAction(),
   });
 }
 
@@ -53,7 +53,12 @@ export function useUserAsceticisms(
       showArchived,
     ),
     queryFn: () =>
-      getUserAsceticisms(parseInt(userId!), startDate, endDate, showArchived),
+      getUserAsceticismsAction(
+        parseInt(userId!),
+        startDate,
+        endDate,
+        showArchived,
+      ),
     enabled: !!userId,
   });
 }
@@ -76,7 +81,7 @@ export function useJoinAsceticism() {
       startDate?: string;
       endDate?: string;
     }) =>
-      joinAsceticism(
+      joinAsceticismAction(
         parseInt(userId),
         asceticismId,
         targetValue,
@@ -117,7 +122,8 @@ export function useLogProgress() {
       completed: boolean;
       value?: number;
       notes?: string;
-    }) => logProgress({ userAsceticismId, date, completed, value, notes }),
+    }) =>
+      logProgressAction({ userAsceticismId, date, completed, value, notes }),
     onSuccess: () => {
       // Invalidate all user asceticism queries to refresh the data
       queryClient.invalidateQueries({
@@ -136,7 +142,8 @@ export function useLeaveAsceticism() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userAsceticismId: number) => leaveAsceticism(userAsceticismId),
+    mutationFn: (userAsceticismId: number) =>
+      leaveAsceticismAction(userAsceticismId),
     onSuccess: () => {
       // Invalidate all user asceticism queries
       queryClient.invalidateQueries({
@@ -168,7 +175,7 @@ export function useUpdateUserAsceticism() {
       targetValue?: number;
       status?: AsceticismStatus;
     }) =>
-      updateUserAsceticism(userAsceticismId, {
+      updateUserAsceticismAction(userAsceticismId, {
         startDate,
         endDate,
         targetValue,

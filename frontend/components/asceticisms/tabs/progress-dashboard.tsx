@@ -57,6 +57,8 @@ import {
   Trophy,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { useAsceticismStore } from "@/lib/stores/asceticismStore";
 
 type TimePeriod = "7d" | "30d" | "90d" | "180d" | "1y" | "all";
 
@@ -77,16 +79,23 @@ const TIME_PERIODS: TimePeriodOption[] = [
 
 export default function ProgressDashboard() {
   const { data: session } = useSession();
-  const userId = session?.user?.id ? parseInt(session.user.id) : null;
+  const userId = session?.user?.id;
 
   const [progressData, setProgressData] = useState<AsceticismProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("7d");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const openSignInDialog = useAsceticismStore(
+    (state) => state.openSignInDialog,
+  );
+
   useEffect(() => {
     async function fetchProgress() {
-      if (!userId) return;
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
 
       setLoading(true);
       try {
@@ -101,9 +110,7 @@ export default function ProgressDashboard() {
       }
     }
 
-    if (userId) {
-      fetchProgress();
-    }
+    fetchProgress();
   }, [timePeriod, userId]);
 
   function getDateRange(period: TimePeriod): {
@@ -417,12 +424,16 @@ export default function ProgressDashboard() {
 
   if (!session || !userId) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed rounded-lg text-muted-foreground">
-        <BarChart3 size={48} className="mb-4 opacity-50" />
-        <p className="text-lg font-semibold">Please sign in</p>
-        <p className="text-sm text-center max-w-md mt-2">
-          You need to be logged in to view your progress data.
+      <div className="flex flex-col items-center justify-center p-16 border-2 border-dashed rounded-lg text-muted-foreground bg-muted/20">
+        <BarChart3 size={64} className="mb-6 text-blue-300 opacity-80" />
+        <p className="text-lg font-medium mb-2">Visualize Your Progress</p>
+        <p className="text-sm text-center max-w-md mb-4">
+          View detailed analytics, completion streaks, and heatmaps of your
+          ascetic practices. Sign in to access your personal dashboard.
         </p>
+        <Button onClick={openSignInDialog} size="lg" className="mt-2">
+          Sign In to View Progress
+        </Button>
       </div>
     );
   }

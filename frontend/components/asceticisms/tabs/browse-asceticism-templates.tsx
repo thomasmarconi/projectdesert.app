@@ -26,6 +26,7 @@ import {
   useUserAsceticisms,
 } from "@/hooks/use-asceticisms";
 import { useSession } from "next-auth/react";
+import JoinAsceticismDialog from "@/components/asceticisms/dialogs/join-asceticism-dialog";
 
 export default function BrowseAsceticismTemplates() {
   const { data: session } = useSession();
@@ -41,9 +42,8 @@ export default function BrowseAsceticismTemplates() {
     true,
   );
 
-  console.log(userAsceticisms, templates);
-
   const { openJoinDialog, openRemoveDialog } = useAsceticismStore();
+
   // Create a map of asceticism ID to user asceticism for quick lookup
   // Prioritize non-archived asceticisms (there can be multiple UserAsceticism records per asceticismId)
   const joinedMap = new Map<number, UserAsceticism>();
@@ -254,6 +254,7 @@ export default function BrowseAsceticismTemplates() {
           </p>
         </div>
       )}
+      <JoinAsceticismDialog />
     </div>
   );
 }

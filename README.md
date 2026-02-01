@@ -56,9 +56,11 @@ make backend   # http://localhost:8000
 | `AUTH_GOOGLE_ID` | Google OAuth Client ID |
 | `AUTH_GOOGLE_SECRET` | Google OAuth Client Secret |
 | `DATABASE_URL` | PostgreSQL connection string |
+| `NEXTAUTH_SECRET` | Secret key used to encode JWT |
 
 ### Backend (`api/.env`)
 
 | Variable | Description |
 |----------|-------------|
 | `DATABASE_URL` | PostgreSQL connection string |
+| `NEXTAUTH_SECRET` | Secret key used to decode JWT |
