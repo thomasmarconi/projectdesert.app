@@ -45,3 +45,28 @@ db-migrate:
 
 db-migrate-create:
 	cd api && $(VENV_BIN)/alembic revision --autogenerate -m "$(message)"
+
+# Full refresh after pulling changes (migrate DB, generate types)
+refresh:
+	@echo "Running database migrations..."
+	cd api && $(VENV_BIN)/alembic upgrade head
+	@echo "Starting backend server..."
+ifeq ($(OS),Windows_NT)
+	powershell -Command "Start-Process -FilePath '$(VENV_BIN)\python.exe' -ArgumentList '-m','uvicorn','app.main:app','--host','0.0.0.0','--port','8000' -WorkingDirectory 'api' -WindowStyle Hidden"
+	@echo "Waiting for backend to be ready..."
+	sleep 5
+	@echo "Generating TypeScript types..."
+	cd frontend && npm run generate:types
+	@echo "Stopping backend server..."
+	npx kill-port 8000 || echo Backend stopped
+else
+	@cd api && $(VENV_BIN)/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 & echo $$! > .backend.pid
+	@echo "Waiting for backend to be ready..."
+	@sleep 5
+	@echo "Generating TypeScript types..."
+	@cd frontend && npm run generate:types
+	@echo "Stopping backend server..."
+	@kill `cat api/.backend.pid` 2>/dev/null || true
+	@rm -f api/.backend.pid
+endif
+	@echo "Refresh complete! DB migrated and frontend types generated"
