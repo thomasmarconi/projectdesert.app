@@ -20,14 +20,23 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { toast } from "sonner";
 import {
   browsePublishedPackagesAction,
   addPackageToAccountAction,
 } from "@/lib/actions/packageActions";
 import { PackageResponse } from "@/lib/services/packageService";
-import { Package, Plus, Check } from "lucide-react";
+import { Package, Plus, Check, Calendar as CalendarIcon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export function BrowsePackagesPage() {
   const { data: session } = useSession();
@@ -36,7 +45,10 @@ export function BrowsePackagesPage() {
   const [selectedPackage, setSelectedPackage] =
     useState<PackageResponse | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [dateDialogOpen, setDateDialogOpen] = useState(false);
   const [addingPackage, setAddingPackage] = useState(false);
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date | undefined>();
 
   useEffect(() => {
     loadPackages();
@@ -60,33 +72,32 @@ export function BrowsePackagesPage() {
     setDetailsDialogOpen(true);
   };
 
-  const handleAddToAccount = async (pkg: PackageResponse) => {
+  const handleInitiateAdd = (pkg: PackageResponse) => {
     if (!session?.user?.email) {
       toast.error("Please sign in to add packages");
       return;
     }
 
+    setSelectedPackage(pkg);
+    setStartDate(new Date());
+    setEndDate(undefined);
+    setDateDialogOpen(true);
+  };
+
+  const handleConfirmAdd = async () => {
+    if (!selectedPackage || !session?.user?.email) return;
+
     try {
       setAddingPackage(true);
       const result = await addPackageToAccountAction(
-        pkg.id,
+        selectedPackage.id,
         session.user.email,
+        startDate,
+        endDate,
       );
 
-      if (result.addedCount > 0) {
-        toast.success(result.message, {
-          description: `${result.addedCount} new asceticism(s) added${
-            result.skippedCount > 0
-              ? `, ${result.skippedCount} already in your account`
-              : ""
-          }`,
-        });
-      } else {
-        toast.info(
-          "All asceticisms from this package are already in your account",
-        );
-      }
-
+      toast.success(result.message);
+      setDateDialogOpen(false);
       setDetailsDialogOpen(false);
     } catch (error) {
       const message =
@@ -168,7 +179,7 @@ export function BrowsePackagesPage() {
               </Button>
               <Button
                 className="flex-1"
-                onClick={() => handleAddToAccount(pkg)}
+                onClick={() => handleInitiateAdd(pkg)}
                 disabled={!session?.user?.email}
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -254,9 +265,118 @@ export function BrowsePackagesPage() {
                   Close
                 </Button>
                 <Button
-                  onClick={() => handleAddToAccount(selectedPackage)}
-                  disabled={addingPackage || !session?.user?.email}
+                  onClick={() => {
+                    if (selectedPackage) {
+                      setDetailsDialogOpen(false);
+                      handleInitiateAdd(selectedPackage);
+                    }
+                  }}
+                  disabled={!session?.user?.email}
                 >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add All to Account
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Date Selection Dialog */}
+      <Dialog open={dateDialogOpen} onOpenChange={setDateDialogOpen}>
+        <DialogContent className="max-w-md">
+          {selectedPackage && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Set Active Dates</DialogTitle>
+                <DialogDescription>
+                  Choose when to activate the asceticisms from &quot;
+                  {selectedPackage.title}&quot;
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Start Date *</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !startDate && "text-muted-foreground",
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {startDate ? (
+                          format(startDate, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={(date) => date && setStartDate(date)}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>End Date (Optional)</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !endDate && "text-muted-foreground",
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {endDate ? (
+                          format(endDate, "PPP")
+                        ) : (
+                          <span>No end date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        disabled={(date) => date < startDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {endDate && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEndDate(undefined)}
+                      className="w-full"
+                    >
+                      Clear End Date
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setDateDialogOpen(false)}
+                  disabled={addingPackage}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleConfirmAdd} disabled={addingPackage}>
                   {addingPackage ? (
                     <>
                       <Spinner className="mr-2" />
@@ -265,7 +385,7 @@ export function BrowsePackagesPage() {
                   ) : (
                     <>
                       <Plus className="mr-2 h-4 w-4" />
-                      Add All to Account
+                      Confirm & Add
                     </>
                   )}
                 </Button>

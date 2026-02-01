@@ -75,6 +75,12 @@ These instructions must be followed for all contributions to this repository.
   - Follow existing routing, validation, and error-handling patterns.
 - Do not mock or fake API responses to bypass missing routes.
 
+## State Management
+
+- State should be managed as much by each component as possible.
+- Limit prop drilling to as little as possible.
+- Use zustand state management stores to enable global state management between shared components.
+
 ## TypeScript / JavaScript
 
 - Use explicit typing where reasonable.

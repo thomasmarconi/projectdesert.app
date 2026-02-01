@@ -1,10 +1,10 @@
-import { PackagesManagementPage } from "@/components/admin/packages-management";
 import { redirect } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ShieldAlert } from "lucide-react";
 import { UserRole } from "@/types/enums";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { auth } from "@/auth";
+import { PackagesManagementPage } from "@/components/admin/packages/packages-management";
 
 export default async function AdminPackagesPage() {
   const session = await auth();

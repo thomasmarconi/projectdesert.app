@@ -64,6 +64,8 @@ export async function getPackageDetailsAction(
 export async function addPackageToAccountAction(
   packageId: number,
   userEmail: string,
+  startDate?: Date,
+  endDate?: Date,
 ): Promise<{
   success: boolean;
   message: string;
@@ -71,5 +73,5 @@ export async function addPackageToAccountAction(
   skippedCount: number;
   totalInPackage: number;
 }> {
-  return addPackageToAccount(packageId, userEmail);
+  return addPackageToAccount(packageId, userEmail, startDate, endDate);
 }
